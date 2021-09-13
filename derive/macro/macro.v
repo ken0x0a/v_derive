@@ -1,10 +1,12 @@
 module macro
 
 pub struct Derive {
+pub:
 	names []string
 }
 
 pub struct Custom {
+pub:
 	name  string            [required]
 	attrs map[string]string
 }
