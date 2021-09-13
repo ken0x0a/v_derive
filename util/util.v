@@ -1,6 +1,7 @@
-module main
+module util
 
 import v.ast
+import term
 
 // https://github.com/vlang/v/blob/master/vlib/v/ast/types.v#L419
 pub fn str_to_type(typ string) ast.Type {
@@ -133,5 +134,64 @@ pub fn debug_stmt(stmt ast.Stmt) {
 		ast.SqlStmt { println(stmt) }
 		ast.StructDecl { println(stmt) }
 		ast.TypeDecl { println(stmt) }
+	}
+}
+pub fn debug_expr(expr ast.Expr) {
+	match expr {
+		ast.AnonFn { println(expr) }
+		ast.ArrayDecompose { println(expr) }
+		ast.ArrayInit { println(expr) }
+		ast.AsCast { println(expr) }
+		ast.Assoc { println(expr) }
+		ast.AtExpr { println(expr) }
+		ast.BoolLiteral { println(expr) }
+		ast.CTempVar { println(expr) }
+		ast.CallExpr { println(expr) }
+		ast.CastExpr { println(expr) }
+		ast.ChanInit { println(expr) }
+		ast.CharLiteral { println(expr) }
+		ast.Comment { println(expr) }
+		// ast.ComptimeCall { println(expr) }
+		ast.ComptimeSelector { println(expr) }
+		ast.ConcatExpr { println(expr) }
+		ast.DumpExpr { println(expr) }
+		ast.EmptyExpr { println(expr) }
+		ast.EnumVal { println(expr) }
+		ast.FloatLiteral { println(expr) }
+		ast.GoExpr { println(expr) }
+		ast.Ident { println(expr) }
+		ast.IfExpr { println(expr) }
+		ast.IfGuardExpr { println(expr) }
+		ast.IndexExpr { println(expr) }
+		ast.InfixExpr { println(expr) }
+		ast.IntegerLiteral { println(expr) }
+		ast.IsRefType { println(expr) }
+		ast.Likely { println(expr) }
+		ast.LockExpr { println(expr) }
+		ast.MapInit { println(expr) }
+		ast.MatchExpr { println(expr) }
+		ast.NodeError { println(expr) }
+		ast.None { println(expr) }
+		ast.OffsetOf { println(expr) }
+		ast.OrExpr { println(expr) }
+		ast.ParExpr { println(expr) }
+		ast.PostfixExpr { println(expr) }
+		ast.PrefixExpr { println(expr) }
+		ast.RangeExpr { println(expr) }
+		ast.SelectExpr { println(expr) }
+		ast.SelectorExpr { println(expr) }
+		ast.SizeOf { println(expr) }
+		ast.SqlExpr { println(expr) }
+		ast.StringInterLiteral { println(expr) }
+		ast.StringLiteral { println(expr) }
+		ast.StructInit { println(expr) }
+		ast.TypeNode { println(expr) }
+		ast.TypeOf { println(expr) }
+		ast.UnsafeExpr { println(expr) }
+		else { 
+			eprint(term.red('unsupported type'))
+			eprintln(expr.type_name())
+			println(expr)
+		}
 	}
 }
