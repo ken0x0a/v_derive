@@ -26,10 +26,31 @@ pub fn (self Codegen) scope() &ast.Scope {
 pub fn (self Codegen) to_code_string() string {
 	return fmt.fmt(self.file, self.table, &pref.Preferences{}, false)
 }
-pub struct NewPlainArg {
+pub struct NewPlainArgs {
 	mod_name string = 'main'
 }
-pub fn new_plain(arg NewPlainArg) Codegen {
+pub struct NewWithAllArgs {
+	mod_name string
+	scope      &ast.Scope     = &ast.Scope{
+		parent: 0
+	}
+	file       &ast.File
+	table        &ast.Table
+}
+pub struct NewWithTableArgs {
+	mod_name string
+	table        &ast.Table
+}
+pub fn new_plain(args NewPlainArgs) Codegen {
+
+	mut table := ast.new_table()
+	return new_with_table(NewWithTableArgs{
+		...args,
+		table: table
+	})
+}
+[inline]
+pub fn new_with_table(args NewWithTableArgs) Codegen {
 	scope := &ast.Scope{
 		parent: 0
 	}
@@ -37,22 +58,25 @@ pub fn new_plain(arg NewPlainArg) Codegen {
 		global_scope: scope
 		scope: scope
 		mod: ast.Module{
-			name: arg.mod_name
-			short_name: arg.mod_name
+			name: args.mod_name
+			short_name: args.mod_name
 			is_skipped: false
 		}
 	}
-	mut table := ast.new_table()
-
+	return new_with_all(NewWithAllArgs{...args, table: args.table, file: file, scope: scope
+})
+}
+[inline]
+pub fn new_with_all(args NewWithAllArgs) Codegen {
 	mut gen := Codegen{
-		table: table
-		file: file
+		table: args.table
+		file: args.file
 		no_main: true
-		mod: arg.mod_name
+		mod: args.mod_name
 	}
 	gen.file.stmts << ast.Module{
-		name: arg.mod_name
-		short_name: arg.mod_name
+		name: args.mod_name
+		short_name: args.mod_name
 		is_skipped: false
 	}
 	return gen
@@ -68,6 +92,9 @@ pub fn (mut self Codegen) gen_import(name string) ast.Import {
 	}
 }
 
+pub fn (mut self Codegen) string_literal(str string) ast.Expr {
+	return ast.StringLiteral{val: str}
+}
 pub fn (mut self Codegen) ident(name string) ast.Expr {
 	return ast.Ident{
 		name: name
@@ -206,11 +233,11 @@ pub fn (mut self Codegen) add_struct_method(opt GenStructMethodOpt) {
 	}
 
 	mut params := opt.params[..]
-	params << ast.Param {
+	params.prepend( ast.Param {
 		name: opt.receiver_name
 		typ: typ
 		is_mut: opt.is_mut
-	}
+	})
 
 	method_idx := type_sym.register_method(ast.Fn{
 		name: opt.name

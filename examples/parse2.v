@@ -48,6 +48,7 @@ pub fn (mut c Client) account_assets() ?AccountAssetResponse {
 		path: '/v1/account/assets'
 	) ?
 	// println(resp)
+	handle_response<AccountAssetResponse>(resp)
 	return handle_response<AccountAssetResponse>(resp)
 }
 
@@ -80,6 +81,12 @@ fn handle_response<T>(resp http.Response) ?T {
 			println(table.type_symbols[stmt.receiver.typ.idx()].cname)
 			// println(table.bitsize_to_type(stmt.receiver.typ))
 			// println(stmt.receiver.default_expr)
+			for fn_stmt in stmt.stmts {
+				util.debug_stmt(fn_stmt)
+				if fn_stmt is ast.ExprStmt {
+					util.debug_expr(fn_stmt.expr)
+				}
+			}
 		}
 		if stmt is ast.StructDecl {
 			print('StructDecl ')
