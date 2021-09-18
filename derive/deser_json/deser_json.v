@@ -71,6 +71,7 @@ fn get_assign_right_expr(mut self Codegen, field_name string, js_field_name stri
 							left: ast.IndexExpr{
 								index: self.string_literal(js_field_name)
 								left: self.ident(json2_map_name)
+								or_expr: ast.OrExpr{ kind: .block, stmts: [self.integer_literal_stmt(0)] } // ast.CastExpr('json2.Any')
 							}
 							scope: self.scope(), is_method: true
 						}
