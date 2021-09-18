@@ -59,21 +59,25 @@ fn set_field_stmt(mut self Codegen, field_name string, js_field_name string, typ
 fn get_assign_right_expr(mut self Codegen, field_name string, js_field_name string, typ ast.Type) ast.Expr {
 	if typ > ast.builtin_type_names.len {
 		type_sym := self.table.get_type_symbol(typ)
-		arg := ast.CallArg {
-						expr: ast.IndexExpr{
-							index: self.string_literal(js_field_name)
-							left: self.ident(json2_map_name)
-						}
-					}
 		if type_sym.name.starts_with('map[') {
 			// map
 			type_arg := type_sym.name.split_nth(']', 2)[1]
 			type_arg_idx := ast.Type(self.table.type_idxs[type_arg])
 			return ast.Expr(ast.CallExpr{
 					name: decode_json_map_fn_name
-					args: [arg]
+					args: [ast.CallArg {
+						expr: ast.CallExpr{
+							name: 'as_map'
+							left: ast.IndexExpr{
+								index: self.string_literal(js_field_name)
+								left: self.ident(json2_map_name)
+							}
+							scope: self.scope(), is_method: true
+						}
+					}]
 					concrete_types: [type_arg_idx]
 					scope: self.scope(), is_method: false // left: self.ident('j')
+					or_block: ast.OrExpr{ kind: .propagate }
 			})
 		} else if type_sym.name.starts_with('[') {
 			// array
@@ -81,18 +85,55 @@ fn get_assign_right_expr(mut self Codegen, field_name string, js_field_name stri
 			type_arg_idx := ast.Type(self.table.type_idxs[type_arg])
 			return ast.Expr(ast.CallExpr{
 					name: decode_json_array_fn_name
-					args: [arg]
+					args: [ast.CallArg {
+						expr: ast.CallExpr{
+							name: 'arr'
+							left: ast.IndexExpr{
+								index: self.string_literal(js_field_name)
+								left: self.ident(json2_map_name)
+								or_expr: ast.OrExpr{ kind: .block, stmts: [self.integer_literal_stmt(0)] }
+							}
+							scope: self.scope(), is_method: true
+						}
+					}]
 					concrete_types: [type_arg_idx]
 					scope: self.scope(), is_method: false // left: self.ident('j')
+					or_block: ast.OrExpr{ kind: .propagate }
 			})
 		}
 		// else {
 			// 'json'
+			mut decode_fn_name := decode_json_fn_name
+			mut concrete_types := [typ]
+			type_info := type_sym.info
+			if type_info is ast.Enum {
+				for attr in self.table.enum_decls[type_sym.name].attrs {
+					if attr.name == 'deser_json_with' {
+						decode_fn_name = attr.arg
+						concrete_types.pop()
+					}
+				}
+			}
+			if type_info is ast.Struct {
+				for attr in type_info.attrs {
+					if attr.name == 'deser_json_with' {
+						decode_fn_name = attr.arg
+						concrete_types.pop()
+					}
+				}
+			}
 			return ast.Expr(ast.CallExpr{
-					name: decode_json_fn_name
-					args: [arg]
-					concrete_types: [typ]
+					name: decode_fn_name
+					args: [ast.CallArg {
+						expr: ast.IndexExpr{
+							index: self.string_literal(js_field_name)
+							left: self.ident(json2_map_name)
+							or_expr: ast.OrExpr{ kind: .block, stmts: [self.integer_literal_stmt(0)] }
+						}
+					}]
+					concrete_types: concrete_types
 					scope: self.scope(), is_method: false // left: self.ident('j')
+					or_block: ast.OrExpr{ kind: .propagate }
 				})
 		// }
 	} else if typ == ast.array_type_idx {
@@ -106,6 +147,7 @@ fn get_assign_right_expr(mut self Codegen, field_name string, js_field_name stri
 				left: ast.IndexExpr{
 					index: self.string_literal(js_field_name)
 					left: self.ident(json2_map_name)
+					or_expr: ast.OrExpr{ kind: .block, stmts: [self.integer_literal_stmt(0)] }
 				}
 				scope: self.scope()
 				is_method: true

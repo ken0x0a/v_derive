@@ -4,7 +4,7 @@ import v.ast
 // import v.checker
 import v.fmt
 import v.pref
-import v.token
+// import v.token
 import util {str_to_type}
 
 pub struct Codegen {
@@ -92,6 +92,13 @@ pub fn (mut self Codegen) gen_import(name string) ast.Import {
 	}
 }
 
+// for `or_expr`
+pub fn (mut self Codegen) integer_literal_stmt(val int) ast.Stmt {
+	return ast.ExprStmt{expr: ast.IntegerLiteral{val: val.str()}}
+}
+pub fn (mut self Codegen) integer_literal(val int) ast.Expr {
+	return ast.IntegerLiteral{val: val.str()}
+}
 pub fn (mut self Codegen) string_literal(str string) ast.Expr {
 	return ast.StringLiteral{val: str}
 }
