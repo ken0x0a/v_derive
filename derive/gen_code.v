@@ -42,7 +42,8 @@ pub fn gen_derive_for_struct(mut gen Codegen, macro_name string, decl StructDecl
 				// 	obj := j.as_map()
 				// 	self.field_name = obj[js_field_name].type()
 				// }
-				deser_json.add_decode_json(mut gen, decl)
+				// deser_json.add_decode_json(mut gen, decl)
+				deser_json.add_decode_json_fn(mut gen, decl)
 				
 // 				mut table := ast.new_table()
 // 				mut fn_template := parser.parse_text('
