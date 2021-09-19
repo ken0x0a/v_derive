@@ -7,6 +7,7 @@ import tool.codegen.codegen {Codegen}
 
 const (
 	json2_map_name = 'obj'
+	decode_json_pub_fn_prefix = 'deser_json'
 	decode_json_member_name = 'decode_json'
 	decode_json_fn_name = 'macro_deser_json'
 	decode_json_map_fn_name = 'macro_deser_json_map'

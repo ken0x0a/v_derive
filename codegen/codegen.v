@@ -102,6 +102,25 @@ pub fn (mut self Codegen) integer_literal(val int) ast.Expr {
 pub fn (mut self Codegen) string_literal(str string) ast.Expr {
 	return ast.StringLiteral{val: str}
 }
+pub struct IdentOpt {
+	is_mut bool
+}
+pub fn (mut self Codegen) ident_opt(name string, opt IdentOpt) ast.Expr {
+	if opt.is_mut {
+		return ast.Ident{
+			name: name
+			scope: self.scope
+			// info: ast.IdentVar{}
+			is_mut: opt.is_mut
+			info: ast.IdentInfo(ast.IdentVar{
+				is_mut: opt.is_mut
+				share: .mut_t
+			})
+		}
+	} else {
+		return self.ident(name)
+	}
+}
 pub fn (mut self Codegen) ident(name string) ast.Expr {
 	return ast.Ident{
 		name: name
@@ -191,6 +210,7 @@ pub struct GenFnDeclOpt {
 	body_stmts []ast.Stmt [required]
 	comments []ast.Comment [required]
 	params []ast.Param [required]
+	attrs []ast.Attr
 }
 
 pub fn (mut self Codegen) add_fn(opt GenFnDeclOpt) {
@@ -204,6 +224,7 @@ pub fn (mut self Codegen) gen_fn(opt GenFnDeclOpt) ast.Stmt {
 		name: opt.name
 		scope: self.scope
 		comments: opt.comments
+		attrs: opt.attrs
 	}
 }
 

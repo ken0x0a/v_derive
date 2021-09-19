@@ -21,7 +21,8 @@ fn main() {
 	mut table := ast.new_table()
 	parsed := parser.parse_file(filename, table, .parse_comments, &pref.Preferences{})
 	mut gen := codegen.new_with_table(mod_name: parsed.mod.name, table: table)
-	deser_json.add_template_stmts(mut gen, parsed.mod.name)
+	// deser_json.add_template_stmts(mut gen, parsed.mod.name)
+	deser_json.add_template_stmts__fn(mut gen, parsed.mod.name)
 
 	for stmt in parsed.stmts {
 		if stmt is ast.StructDecl {

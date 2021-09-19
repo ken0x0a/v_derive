@@ -63,25 +63,32 @@ pub fn add_template_stmts__fn(mut gen Codegen, mod_name string) {
 import x.json2
 
 [inline]
-fn deser_json_map_cb<T>(src string, cb fn(json2.Any) T) ?map[string]T {
-	decoded := json2.raw_decode(src) ?
-
+fn ${decode_json_fn_name}__map__cb<T>(src map[string]json2.Any, cb fn(json2.Any) ?T) ?map[string]T {
 	mut res := map[string]T{}
-	for key, val in decoded.as_map() {
-		res[key] = macro_deser_json<T>(val) ?
+	for key, val in src {
+		res[key] = cb(val) ?
+	}
+	return res
+}
+[inline]
+fn ${decode_json_fn_name}__map_map__cb<T>(src map[string]json2.Any, cb fn(json2.Any) ?T) ?map[string]map[string]T {
+	mut res := map[string]map[string]T{}
+	for key, val in src {
+		res[key] = ${decode_json_fn_name}__map__cb<T>(val.as_map(), cb) ?
 	}
 	return res
 }
 
 [inline]
-fn deser_json_map_map_cb<T>(src string, cb fn(json2.Any) T) ?map[string]map[string]T {
+fn ${decode_json_pub_fn_prefix}__map__cb<T>(src string, cb fn(json2.Any) T) ?map[string]T {
 	decoded := json2.raw_decode(src) ?
+	return ${decode_json_fn_name}__map__cb<T>(decoded.as_map(), cb)
+}
 
-	mut res := map[string]map[string]T{}
-	for key, val in decoded.as_map() {
-		res[key] = macro_deser_json_map_cb<T>(val.as_map(), cb) ?
-	}
-	return res
+[inline]
+fn ${decode_json_pub_fn_prefix}__map_map__cb<T>(src string, cb fn(json2.Any) T) ?map[string]map[string]T {
+	decoded := json2.raw_decode(src) ?
+	return ${decode_json_fn_name}__map_map__cb<T>(decoded.as_map(), cb)
 }
 '
 	parsed := parser.parse_text(decode_json_fn_str, 'a.v', gen.table, .parse_comments, &pref.Preferences{})
