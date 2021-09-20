@@ -9,13 +9,13 @@ pub fn add_template_stmts(mut gen Codegen, mod_name string) {
 import x.json2
 
 [inline]
-fn ${decode_json_fn_name}<T>(src json2.Any) ?T {
+fn $decode_json_fn_name<T>(src json2.Any) ?T {
 	mut typ := T{}
 	typ.${decode_json_member_name}(src) ?
 	return typ
 }
 [inline]
-fn ${decode_json_map_fn_name}<T>(src map[string]json2.Any) ?map[string]T {
+fn $decode_json_map_fn_name<T>(src map[string]json2.Any) ?map[string]T {
 	mut res := map[string]T{}
 	for key,val in src {
 		res[key] = $decode_json_fn_name<T>(val) ?
@@ -23,7 +23,7 @@ fn ${decode_json_map_fn_name}<T>(src map[string]json2.Any) ?map[string]T {
 	return res
 }
 [inline]
-fn ${decode_json_array_fn_name}<T>(src []json2.Any) ?[]T {
+fn $decode_json_array_fn_name<T>(src []json2.Any) ?[]T {
 	return src.map($decode_json_fn_name<T>(it) ?)
 }
 [inline]
@@ -53,11 +53,13 @@ fn deser_json_map_map<T>(src string) ?map[string]map[string]T {
 }
 '
 
-	parsed := parser.parse_text(decode_json_fn_str, 'a.v', gen.table, .parse_comments, &pref.Preferences{})
+	parsed := parser.parse_text(decode_json_fn_str, 'a.v', gen.table, .parse_comments,
+		&pref.Preferences{})
 	for stmt in parsed.stmts[2..] {
 		gen.add_stmt(stmt)
 	}
 }
+
 pub fn add_template_stmts__fn(mut gen Codegen, mod_name string) {
 	decode_json_fn_str := 'module $mod_name
 import x.json2
@@ -91,7 +93,8 @@ fn ${decode_json_pub_fn_prefix}__map_map__cb<T>(src string, cb fn(json2.Any) T) 
 	return ${decode_json_fn_name}__map_map__cb<T>(decoded.as_map(), cb)
 }
 '
-	parsed := parser.parse_text(decode_json_fn_str, 'a.v', gen.table, .parse_comments, &pref.Preferences{})
+	parsed := parser.parse_text(decode_json_fn_str, 'a.v', gen.table, .parse_comments,
+		&pref.Preferences{})
 	for stmt in parsed.stmts[2..] {
 		gen.add_stmt(stmt)
 	}

@@ -16,7 +16,7 @@ fn get_decode_fn_name(struct_name string) string {
 
 fn get_decode_map_fn_name(struct_name string, depth int) string {
 	mut res := '${decode_json_fn_name}__'
-	for _ in 0..depth {
+	for _ in 0 .. depth {
 		res += 'map_'
 	}
 	name := get_struct_name_without_module(struct_name)
