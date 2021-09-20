@@ -13,11 +13,16 @@ pub fn (mut p Codegen) find_type_or_add_placeholder(name string, language ast.La
 		}
 		return ast.new_type(idx)
 	} else {
-		eprintln(term.red('not found type "$name"'))
+		$if debug_codegen ? {
+			eprintln(term.red('not found type "$name"'))
+			dump(name)
+		}
 		if name.starts_with('map[') {
 			parts := name[4..].split_nth(']', 2)
 			map_type_idx := p.table.find_or_register_map(p.find_type_or_add_placeholder(parts[0], .v), p.find_type_or_add_placeholder(parts[1], .v))
-			dump(map_type_idx)
+			$if debug_codegen ? {
+				dump(map_type_idx)
+			}
 			if map_type_idx > 0 {
 				return ast.new_type(map_type_idx)
 			}

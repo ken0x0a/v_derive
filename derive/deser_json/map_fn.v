@@ -81,8 +81,10 @@ fn register_map_fn_if_not_exist(mut self Codegen, typ ast.Type, typ_arg string, 
 
 		// return_type := self.find_type_or_add_placeholder(typ_sym.name, .v)
 		return_type := typ.set_flag(.optional)
-		dump(self.find_type_or_add_placeholder('map[string]json2.Any', .v))
-		dump(typ)
+		$if debug_ast ? {
+			dump(self.find_type_or_add_placeholder('map[string]json2.Any', .v))
+			dump(typ)
+		}
 		params := [ast.Param{ name: 'src', typ: self.find_type_or_add_placeholder('map[string]json2.Any', .v) }]
 
 		// ## Register to table
