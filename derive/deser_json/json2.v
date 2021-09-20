@@ -1,6 +1,7 @@
 module deser_json
 
 import v.ast
+import tool.codegen.codegen as cg
 
 fn get_json2_method_name(typ ast.Type) (string, ast.Type) {
 	mut cast_type := ast.Type(0)
@@ -54,11 +55,24 @@ fn get_json2_method_name(typ ast.Type) (string, ast.Type) {
 		// ast.error_type_idx         {  }
 		ast.u8_type_idx            {
 			cast_type = ast.byte_type
-			'u64' }
+			'u64'
+		}
 		else {
 			panic('unexpected!! typ $typ')
 		}
 	}
 
 	return method_name, cast_type
+}
+fn get_json2_default_value(typ ast.Type) ast.Stmt {
+	return match typ {
+		ast.i8_type_idx, ast.i16_type_idx, ast.int_type_idx, ast.i64_type_idx, ast.isize_type_idx, ast.byte_type_idx, ast.u16_type_idx, ast.u32_type_idx, ast.u64_type_idx, ast.usize_type_idx, ast.f32_type_idx, ast.f64_type_idx, ast.size_t_type_idx, ast.u8_type_idx      {
+			cg.integer_literal_stmt(0)
+		}
+		ast.bool_type_idx          { cg.bool_literal_stmt(false) }
+		ast.string_type_idx        { cg.string_literal_stmt('') }
+		else {
+			panic('unexpected!! typ $typ')
+		}
+	}
 }

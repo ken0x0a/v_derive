@@ -1,7 +1,6 @@
 module deser_json
 
 import v.ast
-import v.token
 import tool.codegen.util {str_to_type}
 import tool.codegen.codegen {Codegen}
 
@@ -50,7 +49,7 @@ fn get_assign_right_expr__fn(mut self Codegen, field_name string, js_field_name 
 			// map
 			// type_arg := type_sym.name.split_nth(']', 2)[1]
 			type_arg := type_sym.name[10*map_depth..]
-			type_arg_idx := ast.Type(self.table.type_idxs[type_arg])
+			// type_arg_idx := ast.Type(self.table.type_idxs[type_arg])
 			// fn_name := '${get_decode_fn_name(stmt.name)}'
 			fn_name := get_decode_map_fn_name(type_arg, map_depth)
 			register_map_fn_if_not_exist(mut self, typ, type_arg, fn_name, map_depth)
@@ -62,7 +61,7 @@ fn get_assign_right_expr__fn(mut self Codegen, field_name string, js_field_name 
 							left: ast.IndexExpr{
 								index: self.string_literal(js_field_name)
 								left: self.ident(json2_map_name)
-								or_expr: ast.OrExpr{ kind: .block, stmts: [self.integer_literal_stmt(0)] } // ast.CastExpr('json2.Any')
+								or_expr: ast.OrExpr{ kind: .block, stmts: [codegen.string_literal_stmt('')] } // ast.CastExpr('json2.Any')
 							}
 							scope: self.scope(), is_method: true
 						}
@@ -84,7 +83,7 @@ fn get_assign_right_expr__fn(mut self Codegen, field_name string, js_field_name 
 							left: ast.IndexExpr{
 								index: self.string_literal(js_field_name)
 								left: self.ident(json2_map_name)
-								or_expr: ast.OrExpr{ kind: .block, stmts: [self.integer_literal_stmt(0)] }
+								or_expr: ast.OrExpr{ kind: .block, stmts: [codegen.string_literal_stmt('')] }
 							}
 							scope: self.scope(), is_method: true
 						}
@@ -115,13 +114,21 @@ fn get_assign_right_expr__fn(mut self Codegen, field_name string, js_field_name 
 					}
 				}
 			}
+			// if type_info is ast.SumType {
+			// 	for attr in type_info.attrs {
+			// 		if attr.name == 'deser_json_with' {
+			// 			decode_fn_name = attr.arg
+			// 			// concrete_types.pop()
+			// 		}
+			// 	}
+			// }
 			return ast.Expr(ast.CallExpr{
 					name: decode_fn_name
 					args: [ast.CallArg {
 						expr: ast.IndexExpr{
 							index: self.string_literal(js_field_name)
 							left: self.ident(json2_map_name)
-							or_expr: ast.OrExpr{ kind: .block, stmts: [self.integer_literal_stmt(0)] }
+							or_expr: ast.OrExpr{ kind: .block, stmts: [codegen.string_literal_stmt('')] }
 						}
 					}]
 					// concrete_types: concrete_types
@@ -135,12 +142,13 @@ fn get_assign_right_expr__fn(mut self Codegen, field_name string, js_field_name 
 		return ast.Expr(ast.EmptyExpr{}) // TODO:
 	} else {
 		method_name, cast_type := get_json2_method_name(typ)
+		default_value := get_json2_default_value(typ)
 		expr := ast.Expr(ast.CallExpr{
 				name: method_name
 				left: ast.IndexExpr{
 					index: self.string_literal(js_field_name)
 					left: self.ident(json2_map_name)
-					or_expr: ast.OrExpr{ kind: .block, stmts: [self.integer_literal_stmt(0)] }
+					or_expr: ast.OrExpr{ kind: .block, stmts: [default_value] }
 				}
 				scope: self.scope()
 				is_method: true
