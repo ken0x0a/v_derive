@@ -82,13 +82,13 @@ fn ${decode_json_fn_name}__map_map__cb<T>(src map[string]json2.Any, cb fn(json2.
 }
 
 [inline]
-fn ${decode_json_pub_fn_prefix}__map__cb<T>(src string, cb fn(json2.Any) T) ?map[string]T {
+fn ${decode_json_pub_fn_prefix}__map__cb<T>(src string, cb fn(json2.Any) ?T) ?map[string]T {
 	decoded := json2.raw_decode(src) ?
 	return ${decode_json_fn_name}__map__cb<T>(decoded.as_map(), cb)
 }
 
 [inline]
-fn ${decode_json_pub_fn_prefix}__map_map__cb<T>(src string, cb fn(json2.Any) T) ?map[string]map[string]T {
+fn ${decode_json_pub_fn_prefix}__map_map__cb<T>(src string, cb fn(json2.Any) ?T) ?map[string]map[string]T {
 	decoded := json2.raw_decode(src) ?
 	return ${decode_json_fn_name}__map_map__cb<T>(decoded.as_map(), cb)
 }

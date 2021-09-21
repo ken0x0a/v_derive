@@ -24,6 +24,18 @@ fn register_map_fn_if_not_exist(mut self Codegen, typ ast.Type, typ_arg string, 
 	} else {
 		typ_sym := self.table.get_type_symbol(typ)
 		body_stmts := [
+			// obj := j.as_map()
+			ast.Stmt(ast.AssignStmt{
+				left: [self.ident(json2_map_name)]
+				right: [ast.Expr(ast.CallExpr{
+					name: 'as_map'
+					left: self.ident(json2_any_param_name)
+					scope: self.scope()
+					is_method: true
+				})]
+				op: token.Kind.decl_assign // op: token.Kind.and // op: token.Kind.assign
+			}),
+			// 
 			ast.Stmt(ast.AssignStmt{
 				left: [self.ident_opt('res', is_mut: true)]
 				right: [ast.Expr(ast.MapInit{
@@ -48,7 +60,7 @@ fn register_map_fn_if_not_exist(mut self Codegen, typ ast.Type, typ_arg string, 
 			ast.ForInStmt{
 				key_var: 'key'
 				val_var: 'val'
-				cond: self.ident('src')
+				cond: self.ident(json2_map_name)
 				scope: self.scope()
 				stmts: [
 					ast.Stmt(ast.AssignStmt{
@@ -93,8 +105,8 @@ fn register_map_fn_if_not_exist(mut self Codegen, typ ast.Type, typ_arg string, 
 			dump(typ)
 		}
 		params := [ast.Param{
-			name: 'src'
-			typ: self.find_type_or_add_placeholder('map[string]json2.Any', .v)
+			name: json2_any_param_name
+			typ: self.find_type_or_add_placeholder('json2.Any', .v)
 		}]
 
 		// ## Register to table

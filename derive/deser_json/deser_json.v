@@ -2,14 +2,15 @@ module deser_json
 
 import v.ast
 import v.token
-import tool.codegen.util
 import tool.codegen.codegen { Codegen }
 
 const (
 	json2_map_name            = 'obj'
+	json2_any_param_name      = 'j'
 	decode_json_pub_fn_prefix = 'deser_json'
 	decode_json_member_name   = 'decode_json'
 	decode_json_fn_name       = 'macro_deser_json'
+	decode_json_fn_arg_name   = 'src'
 	decode_json_map_fn_name   = 'macro_deser_json_map'
 	decode_json_array_fn_name = 'macro_deser_json_array'
 )
