@@ -8,9 +8,6 @@ pub fn (mut p Codegen) find_type_or_add_placeholder(name string, language ast.La
 	// struct / enum / placeholder
 	mut idx := p.table.find_type_idx(name)
 	if idx > 0 {
-		if idx == ast.size_t_type_idx {
-			return ast.new_type(ast.usize_type_idx)
-		}
 		return ast.new_type(idx)
 	} else {
 		$if debug_codegen ? {
