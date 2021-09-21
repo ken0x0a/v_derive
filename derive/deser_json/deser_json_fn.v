@@ -1,7 +1,6 @@
 module deser_json
 
 import v.ast
-import tool.codegen.util
 import tool.codegen.codegen { Codegen }
 
 // generates
@@ -15,16 +14,16 @@ pub fn add_decode_json_fn(mut self Codegen, stmt ast.StructDecl) {
 	body_stmts << ast.Return{
 		exprs: [
 			ast.Expr(ast.StructInit{
-			// typ: self.table.get_type_symbol(self.table.type_idxs[stmt.name])
-			typ: self.find_type_or_add_placeholder(stmt.name, .v)
-			fields: stmt.fields.map(gen_struct_init_field(mut self, it))
-			// fields: [
-			// 	ast.StructInitField{
-			// 		name: 'field_name'
-			// 		expr: self.string_literal('a')
-			// 	}
-			// ]
-		}),
+				// typ: self.table.get_type_symbol(self.table.type_idxs[stmt.name])
+				typ: self.find_type_or_add_placeholder(stmt.name, .v)
+				fields: stmt.fields.map(gen_struct_init_field(mut self, it))
+				// fields: [
+				// 	ast.StructInitField{
+				// 		name: 'field_name'
+				// 		expr: self.string_literal('a')
+				// 	}
+				// ]
+			}),
 		]
 	}
 	type_self := self.find_type_or_add_placeholder(stmt.name, .v)
