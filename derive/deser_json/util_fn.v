@@ -5,7 +5,7 @@ fn get_struct_name_without_module(struct_name string) string {
 	parts := name.split('.')
 
 	if parts.len > 1 {
-		name = parts[1]
+		name = parts.last()
 	}
 	return name
 }

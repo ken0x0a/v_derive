@@ -31,12 +31,13 @@ fn (mut self DeserJsonFn) gen(stmt ast.StructDecl) {
 		body_stmts << pre_stmt
 	}
 	body_stmts << return_stmt
-	type_self := self.gen.find_type_or_add_placeholder(stmt.name, .v)
+	type_self := self.gen.find_type_or_add_placeholder(get_struct_name_without_module(stmt.name), .v)
 	mut params := [ast.Param{
 		name: 'j'
 		typ: self.gen.find_type_or_add_placeholder('json2.Any', .v)
 	}]
 	self.gen.add_fn(
+		is_pub: true
 		name: get_decode_fn_name(stmt.name)
 		return_type: type_self.set_flag(.optional)
 		body_stmts: body_stmts
