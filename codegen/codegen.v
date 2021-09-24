@@ -85,6 +85,17 @@ pub fn new_with_all(args NewWithAllArgs) Codegen {
 pub fn (mut self Codegen) add_import(name string) {
 	self.file.imports << self.gen_import(name)
 }
+pub struct ImportOpt {
+	symbols []string
+	name string
+}
+pub fn (mut self Codegen) add_import_opt(opt ImportOpt) {
+	self.file.imports << ast.Import{
+		mod: opt.name
+		alias: opt.name.split('.').last()
+		syms: opt.symbols.map(ast.ImportSymbol{name: it})
+	}
+}
 pub fn (mut self Codegen) gen_import(name string) ast.Import {
 	return ast.Import{
 		mod: name
@@ -189,15 +200,22 @@ pub fn (mut self Codegen) gen_comment(opt GenCommentOpt) ast.Comment {
 	}
 }
 
-
+pub fn (mut self Codegen) add_expr_stmt(expr ast.Expr) {
+	self.file.stmts << ast.ExprStmt{
+		is_expr: false
+		expr: expr
+	}
+}
+// \u0001
 pub fn (mut self Codegen) add_comment_stmt(opt GenCommentOpt) {
 		self.file.stmts << self.gen_comment_stmt(opt)
 }
+// \u0001
 pub fn (mut self Codegen) gen_comment_stmt(opt GenCommentOpt) ast.Stmt {
 	return ast.ExprStmt{
 		is_expr: false
 		expr: ast.Comment{
-			text: opt.text
+			text: '\u0001 $opt.text'
 			is_multi: opt.is_multi
 			is_inline: opt.is_inline
 		}
@@ -214,7 +232,10 @@ pub struct GenFnDeclOpt {
 }
 
 pub fn (mut self Codegen) add_fn(opt GenFnDeclOpt) {
-		self.file.stmts << self.gen_fn(opt)
+	for comment in opt.comments {
+		self.add_expr_stmt(comment)
+	}
+	self.file.stmts << self.gen_fn(opt)
 }
 pub fn (mut self Codegen) gen_fn(opt GenFnDeclOpt) ast.Stmt {
 	return ast.FnDecl{
@@ -253,9 +274,16 @@ pub fn (mut self Codegen) add_struct_method(opt GenStructMethodOpt) {
 		println('typ_idx: $typ_idx ${@FILE}:${@LINE}:${@COLUMN}')
 		println(self.table.type_idxs[opt.struct_name])
 	}
+	mut typ := if typ_idx == 0 {
+		t := self.find_type_or_add_placeholder(opt.struct_name, .v)
+		typ_idx = int(t)
+		t
+	} else {
+		ast.new_type(typ_idx)
+	}
 	mut type_sym := self.table.get_type_symbol(typ_idx)
+	// dump(type_sym)
 
-	mut typ := ast.new_type(typ_idx)
 	if opt.is_mut {
 		typ = typ.to_ptr()
 	}
@@ -267,7 +295,8 @@ pub fn (mut self Codegen) add_struct_method(opt GenStructMethodOpt) {
 		is_mut: opt.is_mut
 	})
 
-	method_idx := type_sym.register_method(ast.Fn{
+	// method_idx := 
+	type_sym.register_method(ast.Fn{
 		name: opt.name
 		file_mode: .v
 		params: params
@@ -289,6 +318,9 @@ pub fn (mut self Codegen) add_struct_method(opt GenStructMethodOpt) {
 		mod: self.mod
 		language: .v
 	})
+	for comment in opt.comments {
+		self.add_expr_stmt(comment)
+	}
 	self.file.stmts << self.gen_struct_method(GenStructMethodOpt{...opt, params: params, receiver_type: typ})
 }
 fn (mut self Codegen) gen_struct_method(opt GenStructMethodOpt) ast.Stmt {
