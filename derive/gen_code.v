@@ -3,6 +3,8 @@ module derive
 import v.ast { FnDecl, StructDecl }
 import tool.codegen.macro { Macro, Derive, Custom }
 import tool.codegen.derive.deser_json
+import tool.codegen.derive.as_map
+import tool.codegen.derive.ser_json
 import tool.codegen.codegen {Codegen}
 
 pub type GenCodeDecl = FnDecl | StructDecl
@@ -30,6 +32,13 @@ pub fn gen_code(mut gen Codegen, macro Macro, decl GenCodeDecl) string {
 
 pub fn gen_derive_for_struct(mut gen Codegen, macro_name string, decl StructDecl) {
 	match macro_name {
+		'AsHttpParams' {
+			as_map.add_as_http_params_fn_for_struct(mut gen, decl)
+		}
+		'Ser_json' {
+			gen.add_import('x.json2')
+			ser_json.add_encode_json(mut gen, decl)
+		}
 		'Deser_json' {
 
 			gen.add_import('x.json2')

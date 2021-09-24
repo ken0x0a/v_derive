@@ -229,6 +229,7 @@ pub struct GenFnDeclOpt {
 	comments []ast.Comment [required]
 	params []ast.Param [required]
 	attrs []ast.Attr
+	is_pub bool
 }
 
 pub fn (mut self Codegen) add_fn(opt GenFnDeclOpt) {
@@ -246,6 +247,7 @@ pub fn (mut self Codegen) gen_fn(opt GenFnDeclOpt) ast.Stmt {
 		scope: self.scope
 		comments: opt.comments
 		attrs: opt.attrs
+		is_pub: opt.is_pub
 	}
 }
 

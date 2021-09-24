@@ -65,6 +65,10 @@ pub fn add_template_stmts__fn(mut gen Codegen, mod_name string) {
 import x.json2
 
 [inline]
+fn $decode_json_array_fn_name<T>(src []json2.Any) ?[]T {
+	return src.map($decode_json_fn_name<T>(it) ?)
+}
+[inline]
 fn ${decode_json_fn_name}__map__cb<T>(src map[string]json2.Any, cb fn(json2.Any) ?T) ?map[string]T {
 	mut res := map[string]T{}
 	for key, val in src {
