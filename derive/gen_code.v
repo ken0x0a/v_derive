@@ -1,19 +1,22 @@
 module derive
 
-import v.ast { FnDecl, StructDecl }
+import v.ast { FnDecl, StructDecl, EnumDecl }
+import term
 import tool.codegen.macro { Macro, Derive, Custom }
 import tool.codegen.derive.deser_json
 import tool.codegen.derive.as_map
 import tool.codegen.derive.ser_json
 import tool.codegen.codegen {Codegen}
 
-pub type GenCodeDecl = FnDecl | StructDecl
+pub type GenCodeDecl = FnDecl | StructDecl | EnumDecl
 
 pub fn gen_code(mut gen Codegen, macro Macro, decl GenCodeDecl) string {
 	match decl {
 		ast.StructDecl {
 			match macro {
-				Custom {}
+				Custom {
+					eprintln(term.red('Custom macro $macro is not supported for Struct'))
+				}
 				Derive {
 					for macro_name in macro.names {
 						gen_derive_for_struct(mut gen, macro_name, decl)
@@ -26,23 +29,48 @@ pub fn gen_code(mut gen Codegen, macro Macro, decl GenCodeDecl) string {
 				panic('Only Custom macro is supported for FnDecl')
 			}
 		}
+		ast.EnumDecl {
+			match macro {
+				Custom {
+					eprintln(term.red('Custom macro $macro is not supported for Enum'))
+				}
+				Derive {
+					for macro_name in macro.names {
+						gen_derive_for_enum(mut gen, macro_name, decl)
+					}
+				}
+			}
+		}
 	}
 	return ''
 }
 
+pub fn gen_derive_for_enum(mut gen Codegen, macro_name string, decl EnumDecl) {
+	match macro_name {
+		'Ser_json' {
+			gen.add_import_if_not_exist('x.json2')
+			ser_json.add_encode_json_enum(mut gen, decl)
+		}
+		'Deser_json' {
+			gen.add_import_if_not_exist('x.json2')
+			deser_json.add_decode_json_enum(mut gen, decl)
+		}
+		else {
+			eprintln(term.red('Derive macro $macro_name is not supported for Enum'))
+		}
+	}
+}
 pub fn gen_derive_for_struct(mut gen Codegen, macro_name string, decl StructDecl) {
 	match macro_name {
 		'AsHttpParams' {
 			as_map.add_as_http_params_fn_for_struct(mut gen, decl)
 		}
 		'Ser_json' {
-			gen.add_import('x.json2')
+			gen.add_import_if_not_exist('x.json2')
 			ser_json.add_encode_json(mut gen, decl)
 		}
 		'Deser_json' {
-
-			gen.add_import('x.json2')
-
+			gen.add_import_if_not_exist('x.json2')
 			// mut result := ''
 			// if is_sum_type {
 			// 	'json2.raw()'

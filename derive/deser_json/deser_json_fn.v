@@ -7,9 +7,13 @@ struct DeserJsonFn {
 mut:
 	gen Codegen [required]
 	prepend_stmts []ast.Stmt // ISSUE: 11563
+	// ↓↓↓ for debug ↓↓↓
+	stmt ast.StructDecl
 }
-fn (mut self DeserJsonFn) gen(stmt ast.StructDecl) {
+fn (mut self DeserJsonFn) gen() {
+	stmt := self.stmt
 	mut body_stmts := get_decode_json_base_stmts(mut self.gen)
+	
 
 	// ISSUE: 11563
 	return_stmt := ast.Return{
@@ -56,22 +60,38 @@ fn (mut self DeserJsonFn) gen(stmt ast.StructDecl) {
 // fn macro_decode_json__my_struct_name(j json2.Any) ?MyStructName { ... }
 // ```
 pub fn add_decode_json_fn(mut self Codegen, stmt ast.StructDecl) {
-	mut inst := DeserJsonFn{gen: self}
-	inst.gen(stmt)
+	mut inst := DeserJsonFn{gen: self, stmt: stmt}
+	inst.gen()
 }
 
 // ISSUE: 11563
 fn (mut inst DeserJsonFn) gen_struct_init_field(field ast.StructField) ast.StructInitField {
 	return ast.StructInitField{
 		name: field.name
-		expr: inst.get_assign_right_expr__fn(field.name, get_js_field_name(field),
-			field.typ)
+		expr: inst.get_assign_right_expr__fn(field)
 	}
 }
 
-fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field_name string, js_field_name string, typ ast.Type) ast.Expr {
+fn is_field_required(field &ast.StructField) bool {
+	mut is_required := false
+	for attr in field.attrs {
+		if attr.name == 'required' {
+			is_required = true
+			break
+		}
+	}
+	return is_required
+}
+fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.Expr {
+	field_name := field.name
+	js_field_name := get_js_field_name(field)
+	typ := field.typ // BUG? `u8` is not parsed properly => `def.u8`
+	// if self.table.get_type_symbol(typ).name.split('.').last() == 'u8' { panic("Don't use `u8` as it doesn't parsed properly") }
+	is_required := is_field_required(&field)
+
 	mut self := inst.gen
-	if typ > ast.builtin_type_names.len {
+	// dump(ast.builtin_type_names.len)
+	if !self.table.get_type_symbol(typ).is_builtin() {
 		type_sym := self.table.get_type_symbol(typ)
 		map_depth := get_map_depth(type_sym.name)
 		if map_depth > 0 {
@@ -117,30 +137,32 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field_name string, js_field_
 			type_arg := type_sym.name.split_nth(']', 2)[1]
 			type_arg_idx := ast.Type(self.table.type_idxs[type_arg])
 			dump(type_arg_idx)
-			return ast.Expr(ast.CallExpr{
-				name: decode_json_array_fn_name
-				args: [ast.CallArg{
-					expr: ast.CallExpr{
-						name: 'arr'
-						left: ast.IndexExpr{
-							index: self.string_literal(js_field_name)
-							left: self.ident(json2_map_name)
-							or_expr: ast.OrExpr{
-								kind: .block
-								stmts: [codegen.string_literal_stmt('')]
-							}
-						}
-						scope: self.scope()
-						is_method: true
-					}
-				}]
-				concrete_types: [type_arg_idx]
-				scope: self.scope()
-				is_method: false // left: self.ident('j')
-				or_block: ast.OrExpr{
-					kind: .propagate
-				}
-			})
+			return get_deser_array_expr(mut self, typ, js_field_name)
+			// ISSUE: currently, static method for struct is not allowed
+			// return ast.Expr(ast.CallExpr{
+			// 	name: decode_json_array_fn_name
+			// 	args: [ast.CallArg{
+			// 		expr: ast.CallExpr{
+			// 			name: 'arr'
+			// 			left: ast.IndexExpr{
+			// 				index: self.string_literal(js_field_name)
+			// 				left: self.ident(json2_map_name)
+			// 				or_expr: ast.OrExpr{
+			// 					kind: .block
+			// 					stmts: [codegen.string_literal_stmt('')]
+			// 				}
+			// 			}
+			// 			scope: self.scope()
+			// 			is_method: true
+			// 		}
+			// 	}]
+			// 	concrete_types: [type_arg_idx]
+			// 	scope: self.scope()
+			// 	is_method: false // left: self.ident('j')
+			// 	or_block: ast.OrExpr{
+			// 		kind: .propagate
+			// 	}
+			// })
 		}
 		// else {
 		// 'json'
@@ -197,16 +219,23 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field_name string, js_field_
 		return ast.Expr(ast.EmptyExpr{}) // TODO:
 	} else {
 		method_name, cast_type := get_json2_method_name(typ)
-		default_value := get_json2_default_value(typ)
+		or_expr := if is_required {
+			ast.OrExpr{
+				kind: .propagate
+			}
+		} else {
+			default_value := get_json2_default_value(typ)
+			ast.OrExpr{
+				kind: .block
+				stmts: [default_value]
+			}
+		}
 		expr := ast.Expr(ast.CallExpr{
 			name: method_name
 			left: ast.IndexExpr{
 				index: self.string_literal(js_field_name)
 				left: self.ident(json2_map_name)
-				or_expr: ast.OrExpr{
-					kind: .block
-					stmts: [default_value]
-				}
+				or_expr: or_expr
 			}
 			scope: self.scope()
 			is_method: true

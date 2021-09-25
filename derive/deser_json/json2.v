@@ -75,6 +75,7 @@ fn get_json2_method_name(typ ast.Type) (string, ast.Type) {
 			'u64'
 		}
 		else {
+			dump(typ)
 			panic('unexpected!! typ $typ')
 		}
 	}

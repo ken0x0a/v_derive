@@ -82,6 +82,19 @@ pub fn new_with_all(args NewWithAllArgs) Codegen {
 	return gen
 }
 
+pub fn (self Codegen) has_import(name string) bool {
+	for imp in self.file.imports {
+		if imp.mod == name {
+			return true
+		}
+	}
+	return false
+}
+pub fn (mut self Codegen) add_import_if_not_exist(name string) {
+	if !self.has_import(name) {
+		self.file.imports << self.gen_import(name)
+	}
+}
 pub fn (mut self Codegen) add_import(name string) {
 	self.file.imports << self.gen_import(name)
 }
@@ -96,7 +109,7 @@ pub fn (mut self Codegen) add_import_opt(opt ImportOpt) {
 		syms: opt.symbols.map(ast.ImportSymbol{name: it})
 	}
 }
-pub fn (mut self Codegen) gen_import(name string) ast.Import {
+pub fn (self Codegen) gen_import(name string) ast.Import {
 	return ast.Import{
 		mod: name
 		alias: name.split('.').last()

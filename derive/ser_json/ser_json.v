@@ -82,26 +82,59 @@ fn set_value_stmt(mut self Codegen, field_name string, js_field_name string, typ
 		scope: self.scope()
 	}
 
+	right := get_type_recursively(mut self, field, typ)
+
+	return ast.AssignStmt{
+		left: [ast.Expr(ast.IndexExpr{
+			index: self.string_literal(js_field_name)
+			left: self.ident(ser_json.json2_map_name)
+		})]
+		right: [right]
+		op: token.Kind.assign
+	}
+}
+fn get_type_recursively(mut self Codegen, field ast.Expr, typ ast.Type) ast.Expr {
 	// fallback to parent type, if type has no `str` method
 	mut type_sym := self.table.get_type_symbol(typ)
+	mut has_ser_json_method := false
 	mut has_str_method := false
 	for {
+		if type_sym.has_method(encode_json_member_name) {
+			has_ser_json_method = true
+			break
+		}
 		if type_sym.has_method('str') {
 			has_str_method = true
 			break
 		}
 		info := type_sym.info
 		if info is ast.Alias {
-				type_sym = self.table.get_type_symbol(info.parent_type)
-				println(term.red(type_sym.name))
+			type_sym = self.table.get_type_symbol(info.parent_type)
+			println(term.red(type_sym.name))
+			$if debug {
 				dump(type_sym.name)
-			} else { break }
+			}
+		} else {
+			break
+		}
 	}
 	right := if typ == ast.string_type {
-		ast.Expr(field)
+		field
+	} else if has_ser_json_method {
+		ast.Expr(ast.CallExpr{
+			name: encode_json_member_name
+			left: field
+			scope: self.scope()
+			is_method: true
+		})
 	} else if has_str_method {
-		print(field_name)
-		dump(type_sym.name)
+		// print(field_name)
+		_ = $if debug {
+			dump(type_sym.name)
+			true
+		} $else {
+			true
+		}
 
 		ast.Expr(ast.CallExpr{
 			name: 'str'
@@ -110,12 +143,21 @@ fn set_value_stmt(mut self Codegen, field_name string, js_field_name string, typ
 			is_method: true
 		})
 	} else {
-		match type_sym.info {
+		info := &type_sym.info
+		match info {
 			ast.Map {
-				ast.Expr(field)
+				field
 			}
 			ast.Array {
-				dump(type_sym.info)
+				// $if debug {
+				// 	dump(info)
+				// }
+
+				// elem_type_sym := self.table.get_type_symbol(type_sym.info.elem_type)
+				
+				// match elem_type_sym.info {
+
+				// }
 				j2any := self.find_type_or_add_placeholder('json2.Any', .v)
 				ast.Expr(ast.CastExpr{
 					typ: j2any
@@ -126,7 +168,7 @@ fn set_value_stmt(mut self Codegen, field_name string, js_field_name string, typ
 							share: .mut_t
 							expr: ast.CastExpr{
 								typ: j2any
-								expr: self.ident('it')
+								expr: get_type_recursively(mut self, self.ident('it'), info.elem_type)
 							}
 						}]
 						left: field
@@ -143,20 +185,22 @@ fn set_value_stmt(mut self Codegen, field_name string, js_field_name string, typ
 					is_method: true
 				})
 			}
+			ast.Struct {
+				ast.Expr(ast.CallExpr{
+					name: encode_json_member_name
+					left: field
+					scope: self.scope()
+					is_method: true
+				})
+			}
 			else {
-				ast.Expr(field)
+				field
 			}
 		}
 	}
-	return ast.AssignStmt{
-		left: [ast.Expr(ast.IndexExpr{
-			index: self.string_literal(js_field_name)
-			left: self.ident(ser_json.json2_map_name)
-		})]
-		right: [right]
-		op: token.Kind.assign
-	}
+	return right
 }
+
 
 fn get_js_field_name(field ast.StructField) string {
 	mut name := field.name

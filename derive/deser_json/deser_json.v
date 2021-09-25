@@ -47,8 +47,7 @@ pub fn add_decode_json(mut self Codegen, stmt ast.StructDecl) {
 }
 
 fn get_decode_json_base_stmts(mut self Codegen) []ast.Stmt {
-	return [
-		ast.Stmt(ast.AssignStmt{
+	return [ast.Stmt(ast.AssignStmt{
 		left: [self.ident(deser_json.json2_map_name)]
 		right: [
 			ast.Expr(ast.CallExpr{
@@ -61,8 +60,7 @@ fn get_decode_json_base_stmts(mut self Codegen) []ast.Stmt {
 		// op: token.Kind.assign
 		op: token.Kind.decl_assign
 		// op: token.Kind.and
-	}),
-	]
+	})]
 }
 
 fn set_field_stmt(mut self Codegen, field_name string, js_field_name string, typ ast.Type) ast.Stmt {
