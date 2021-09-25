@@ -46,7 +46,7 @@ pub fn add_encode_json(mut self Codegen, stmt ast.StructDecl) {
 	)
 	self.add_struct_method(
 		struct_name: stmt.name.split('.').last()
-		is_mut: true
+		is_mut: false
 		name: ser_json.encode_json_member_name
 		return_type: ast.string_type
 		body_stmts: body_stmts
@@ -110,8 +110,8 @@ fn get_type_recursively(mut self Codegen, field ast.Expr, typ ast.Type) ast.Expr
 		info := type_sym.info
 		if info is ast.Alias {
 			type_sym = self.table.get_type_symbol(info.parent_type)
-			println(term.red(type_sym.name))
 			$if debug {
+				println(term.red(type_sym.name))
 				dump(type_sym.name)
 			}
 		} else {

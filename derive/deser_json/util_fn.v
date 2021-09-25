@@ -10,7 +10,7 @@ fn get_struct_name_without_module(struct_name string) string {
 	return name
 }
 
-fn get_decode_fn_name(struct_name string) string {
+pub fn get_decode_fn_name(struct_name string) string {
 	return '${decode_json_fn_name}__${to_snake_case(get_struct_name_without_module(struct_name))}'
 }
 

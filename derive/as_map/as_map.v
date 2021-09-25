@@ -80,8 +80,13 @@ fn set_value_stmt(mut self Codegen, field_name string, js_field_name string, typ
 		_ := match info {
 			ast.Alias {
 				type_sym = self.table.get_type_symbol(info.parent_type)
-				println(term.red(type_sym.name))
-				dump(type_sym.name)
+				_ = $if debug {
+					println(term.red(type_sym.name))
+					dump(type_sym.name)
+					true
+				} $else {
+					true
+				}
 				true // ISSUE: 9419
 			}
 			else {true} // ISSUE: 9419
@@ -132,8 +137,8 @@ fn set_value_stmt(mut self Codegen, field_name string, js_field_name string, typ
 				})
 			}
 			else {
-				print(field_name)
-				dump(type_sym.name)
+				// print('${field_name:-20}')
+				// dump(type_sym.name)
 
 				ast.Expr(ast.CallExpr{
 					name: 'str'

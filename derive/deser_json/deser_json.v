@@ -65,13 +65,11 @@ fn get_decode_json_base_stmts(mut self Codegen) []ast.Stmt {
 
 fn set_field_stmt(mut self Codegen, field_name string, js_field_name string, typ ast.Type) ast.Stmt {
 	return ast.AssignStmt{
-		left: [
-			ast.Expr(ast.SelectorExpr{ // 'self.field'
+		left: [ast.Expr(ast.SelectorExpr{ // 'self.field'
 			field_name: field_name
 			expr: self.ident('self')
 			scope: self.scope()
-		}),
-		]
+		})]
 		right: [get_assign_right_expr(mut self, field_name, js_field_name, typ)]
 		// op: token.Kind.assign
 		op: token.Kind.assign

@@ -2,7 +2,6 @@ module deser_json
 
 import v.ast
 import v.token
-import term
 import tool.codegen.codegen { Codegen }
 
 fn get_array_depth_and_type_arg(type_name string) (int, string) {
@@ -41,9 +40,6 @@ fn get_deser_array_expr(mut self Codegen, typ ast.Type, js_field_name string) as
 		// self.table.type_idxs[type_arg]
 		elem_typ := self.find_type_or_add_placeholder(type_arg, .v)
 		method_name, cast_type := get_json2_method_name(elem_typ)
-		print(elem_typ_sym.name)
-		println(term.blue(' is builtin'))
-		dump('')
 		expr := ast.Expr(ast.CallExpr{
 			name: method_name
 			left: self.ident('it')

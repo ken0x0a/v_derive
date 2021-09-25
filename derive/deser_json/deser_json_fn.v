@@ -134,9 +134,8 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 			*/
 		} else if type_sym.name.starts_with('[') {
 			// array
-			type_arg := type_sym.name.split_nth(']', 2)[1]
-			type_arg_idx := ast.Type(self.table.type_idxs[type_arg])
-			dump(type_arg_idx)
+			// type_arg := type_sym.name.split_nth(']', 2)[1]
+			// type_arg_idx := ast.Type(self.table.type_idxs[type_arg])
 			return get_deser_array_expr(mut self, typ, js_field_name)
 			// ISSUE: currently, static method for struct is not allowed
 			// return ast.Expr(ast.CallExpr{

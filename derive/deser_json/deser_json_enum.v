@@ -53,7 +53,7 @@ fn (mut self DeserJsonEnum) get_enum_value_expr(field ast.EnumField, rename_to E
 		}
 		.kebab_case { self.gen.string_literal(field.name.replace('_', '-')) }
 		.screaming_kebab_case { 
-			dump(field.name.replace('_', '-').to_upper())
+			// dump(field.name.replace('_', '-').to_upper())
 			self.gen.string_literal(field.name.replace('_', '-').to_upper()) }
 		.repr {
 			if field.has_expr {
