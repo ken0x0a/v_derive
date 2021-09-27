@@ -65,15 +65,30 @@ fn main() {
 fn derive_code_for_stmts(mut gen Codegen, parsed ast.File) {
 	for stmt in parsed.stmts {
 		if stmt is ast.StructDecl {
-			mut macros := []Macro{}
-			for attr in stmt.attrs {
-				if attr.name == 'derive' {
-					macros << Macro(Derive{names: attr.arg.split(',')})
-				}
-			}
+			macros := get_macros(&stmt)
 			for macro in macros {
 				derive.gen_code(mut gen, macro, derive.GenCodeDecl(stmt as ast.StructDecl))
 			}
 		}
+		if stmt is ast.EnumDecl {
+			macros := get_macros(&stmt)
+			for macro in macros {
+				derive.gen_code(mut gen, macro, derive.GenCodeDecl(stmt as ast.EnumDecl))
+			}
+		}
+
 	}
+}
+
+interface HasAttrs {
+	attrs []ast.Attr
+}
+fn get_macros(stmt HasAttrs) []Macro {
+	mut macros := []Macro{}
+	for attr in stmt.attrs {
+		if attr.name == 'derive' {
+			macros << Macro(Derive{names: attr.arg.split(',').map(it.trim_space())})
+		}
+	}
+	return macros
 }
