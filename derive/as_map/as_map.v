@@ -5,7 +5,7 @@ import v.token
 import term
 import tool.codegen.codegen { Codegen }
 
-const (
+pub const (
 	json2_map_name         = 'obj'
 	fn_name_as_http_params = 'as_http_params'
 )
@@ -42,7 +42,7 @@ pub fn add_as_http_params_fn_for_struct(mut self Codegen, stmt ast.StructDecl) {
 	})
 	self.add_struct_method(
 		struct_name: stmt.name.split('.').last()
-		is_mut: true
+		is_mut: false
 		name: fn_name_as_http_params
 		return_type: return_type
 		body_stmts: body_stmts
