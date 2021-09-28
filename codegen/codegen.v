@@ -20,6 +20,15 @@ pub mut:
 	table        &ast.Table
 }
 
+pub fn (mut self Codegen) scope_into_child() {
+	scope := &ast.Scope{
+		parent: self.scope
+	}
+	self.scope = scope
+}
+pub fn (mut self Codegen) scope_into_parent() {
+	self.scope = self.scope.parent
+}
 pub fn (self Codegen) scope() &ast.Scope {
 	return self.scope
 }
@@ -82,6 +91,11 @@ pub fn new_with_all(args NewWithAllArgs) Codegen {
 	return gen
 }
 
+pub fn (mut self Codegen) add_file_comments(texts ...string) {
+	for text in texts {
+		self.file.stmts.prepend(self.gen_comment_stmt(text: text))
+	}
+}
 pub fn (self Codegen) has_import(name string) bool {
 	for imp in self.file.imports {
 		if imp.mod == name {
@@ -153,7 +167,10 @@ pub fn (mut self Codegen) ident(name string) ast.Expr {
 	}
 }
 
-
+[inline]
+pub fn (mut self Codegen) gen_blank_stmt() ast.Stmt {
+	return ast.Stmt(ast.ExprStmt{expr: ast.empty_expr()})
+}
 
 pub fn (mut self Codegen) add_struct_decl(opt ast.StructDecl) {
 		self.file.stmts << self.gen_struct_decl(opt)

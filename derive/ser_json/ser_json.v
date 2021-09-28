@@ -5,6 +5,9 @@ import v.token
 import term
 import tool.codegen.codegen { Codegen }
 
+pub const (
+	macro_name = 'Ser_json'
+)
 const (
 	json2_map_name            = 'obj'
 	json2_any_param_name      = 'j'
@@ -96,6 +99,12 @@ fn set_value_stmt(mut self Codegen, field_name string, js_field_name string, typ
 fn get_type_recursively(mut self Codegen, field ast.Expr, typ ast.Type) ast.Expr {
 	// fallback to parent type, if type has no `str` method
 	mut type_sym := self.table.get_type_symbol(typ)
+	if type_sym.name == 'Symbol' {
+		dump('type_sym')
+		println(type_sym)
+		println(type_sym.has_method(encode_json_member_name))
+		println(type_sym.has_method('str'))
+	}
 	mut has_ser_json_method := false
 	mut has_str_method := false
 	for {

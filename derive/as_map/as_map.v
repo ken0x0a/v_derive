@@ -6,8 +6,11 @@ import term
 import tool.codegen.codegen { Codegen }
 
 pub const (
-	json2_map_name         = 'obj'
+	name_as_http_params    = 'AsHttpParams'
 	fn_name_as_http_params = 'as_http_params'
+)
+const (
+	json2_map_name         = 'obj'
 )
 
 // generates

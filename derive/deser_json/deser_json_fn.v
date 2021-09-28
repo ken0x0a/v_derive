@@ -216,19 +216,28 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 		return ast.Expr(ast.EmptyExpr{}) // TODO:
 	} else if typ == ast.map_type_idx {
 		return ast.Expr(ast.EmptyExpr{}) // TODO:
+	} else if field.attrs.contains(attr_json2_as) {
+		// .${method_name_josn2}().${method_name_chain}()
+		method_name_josn2 := field.attrs.filter(it.name == attr_json2_as)[0].arg
+		method_name_chain := self.table.get_type_symbol(typ).name
+		return ast.Expr(ast.CallExpr{
+			scope: self.scope()
+			is_method: true
+			name: method_name_chain
+			left: ast.CallExpr{
+				scope: self.scope()
+				is_method: true
+				name: method_name_josn2
+				left: ast.IndexExpr{
+					index: self.string_literal(js_field_name)
+					left: self.ident(json2_map_name)
+					or_expr: get_json2_map_index_or_expr(is_required, typ)
+				}
+			}
+		})
 	} else {
 		method_name, cast_type := get_json2_method_name(typ)
-		or_expr := if is_required {
-			ast.OrExpr{
-				kind: .propagate
-			}
-		} else {
-			default_value := get_json2_default_value(typ)
-			ast.OrExpr{
-				kind: .block
-				stmts: [default_value]
-			}
-		}
+		or_expr := get_json2_map_index_or_expr(is_required, typ)
 		expr := ast.Expr(ast.CallExpr{
 			name: method_name
 			left: ast.IndexExpr{
@@ -248,3 +257,17 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 		return expr
 	}
 }
+
+fn get_json2_map_index_or_expr(is_required bool, typ ast.Type) ast.OrExpr {
+	return if is_required {
+		ast.OrExpr{
+			kind: .propagate
+		}
+	} else {
+		default_value := get_json2_default_value(typ)
+		ast.OrExpr{
+			kind: .block
+			stmts: [default_value]
+		}
+	}
+} 

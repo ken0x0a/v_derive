@@ -47,11 +47,11 @@ pub fn gen_code(mut gen Codegen, macro Macro, decl GenCodeDecl) string {
 
 pub fn gen_derive_for_enum(mut gen Codegen, macro_name string, decl EnumDecl) {
 	match macro_name {
-		'Ser_json' {
+		ser_json.macro_name {
 			gen.add_import_if_not_exist('x.json2')
 			ser_json.add_encode_json_enum(mut gen, decl)
 		}
-		'Deser_json' {
+		deser_json.macro_name {
 			gen.add_import_if_not_exist('x.json2')
 			deser_json.add_decode_json_enum(mut gen, decl)
 		}
@@ -62,14 +62,14 @@ pub fn gen_derive_for_enum(mut gen Codegen, macro_name string, decl EnumDecl) {
 }
 pub fn gen_derive_for_struct(mut gen Codegen, macro_name string, decl StructDecl) {
 	match macro_name {
-		'AsHttpParams' {
+		as_map.name_as_http_params {
 			as_map.add_as_http_params_fn_for_struct(mut gen, decl)
 		}
-		'Ser_json' {
+		ser_json.macro_name {
 			gen.add_import_if_not_exist('x.json2')
 			ser_json.add_encode_json(mut gen, decl)
 		}
-		'Deser_json' {
+		deser_json.macro_name {
 			gen.add_import_if_not_exist('x.json2')
 			// mut result := ''
 			// if is_sum_type {

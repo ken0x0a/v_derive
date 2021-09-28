@@ -90,7 +90,8 @@ fn get_deser_array_expr(mut self Codegen, typ ast.Type, js_field_name string) as
 						left: self.ident(json2_map_name)
 						or_expr: ast.OrExpr{
 							kind: .block
-							stmts: [codegen.string_literal_stmt('')]
+							// stmts: []
+							stmts: [ast.Stmt(ast.ExprStmt{expr:ast.ArrayInit{typ: self.find_type_or_add_placeholder('[]json2.Any', .v), elem_type: self.find_type_or_add_placeholder('json2.Any', .v)}})]
 						}
 					}
 					scope: self.scope()

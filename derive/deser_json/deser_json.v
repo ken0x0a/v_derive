@@ -4,6 +4,12 @@ import v.ast
 import v.token
 import tool.codegen.codegen { Codegen }
 
+pub const (
+	macro_name = 'Deser_json'
+	attr = 'deser_json'
+	attr_with = 'deser_json_with'
+	attr_json2_as = 'deser_json_as'
+)
 const (
 	json2_map_name            = 'obj'
 	json2_any_param_name      = 'j'

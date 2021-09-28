@@ -5,6 +5,8 @@ import v.token
 import term
 import tool.codegen.codegen { Codegen }
 
+const enum_rename_set = ['snake_case', 'UPPER_CASE', 'PascalCase', 'camelCase', 'kebab-case', 'SCREAMING-KEBAB-CASE', 'repr']
+
 enum EnumRename {
 	snake_case
 	upper_case // UPPER_CASE
@@ -143,6 +145,7 @@ fn (self DeserJsonEnum) get_rename_method() EnumRename {
 				'repr' { EnumRename.repr }
 				else {
 					eprintln(term.red('Unexpected serde_rename attr: $attr.arg'))
+					eprintln('must be one of "$enum_rename_set"')
 					dump(attr.name)
 					exit(1)
 				}
