@@ -199,20 +199,16 @@ fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 				// if status == 0 {
 				cond: ast.Expr(
 					ast.InfixExpr{
-						op: token.Kind.eq
+						op: token.Kind.ne
 						left: field_sel
 						right: default_expr
 					}
 				)
-				stmts: []
-			},
-			ast.IfBranch{
-				scope: self.scope()
 				stmts: [ast.Stmt(assign_stmt)]
 			}
 		]
 		is_expr: false
-		has_else: true
+		has_else: false
 	}
 	return ast.ExprStmt{
 		expr: if_expr
