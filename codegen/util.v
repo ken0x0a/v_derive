@@ -3,11 +3,17 @@ module codegen
 import v.ast
 import v.parser
 
-pub fn integer_literal_stmt(val int) ast.Stmt {
-	return ast.ExprStmt{expr: integer_literal(val)}
+pub fn integer_literal_stmt<T>(val T) ast.Stmt {
+	return ast.ExprStmt{expr: integer_literal<T>(val)}
 }
-pub fn integer_literal(val int) ast.Expr {
+pub fn integer_literal<T>(val T) ast.Expr {
 	return ast.IntegerLiteral{val: val.str()}
+}
+pub fn float_literal_stmt(val f64) ast.Stmt {
+	return ast.ExprStmt{expr: float_literal(val)}
+}
+pub fn float_literal(val f64) ast.Expr {
+	return ast.FloatLiteral{val: val.strlong()}
 }
 pub fn string_literal_stmt(str string) ast.Stmt {
 	return ast.ExprStmt{expr: string_literal(str)}

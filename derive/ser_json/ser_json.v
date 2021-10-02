@@ -8,6 +8,7 @@ import tool.codegen.codegen { Codegen }
 pub const (
 	macro_name = 'Ser_json'
 	attr_json2_as = 'ser_json_as'
+	attr_skip_if_default = 'ser_json_skip_if_default'
 )
 const (
 	json2_map_name            = 'obj'
@@ -33,7 +34,7 @@ pub fn add_encode_json(mut self Codegen, stmt ast.StructDecl) {
 	// mut body_stmts := []ast.Stmt{}
 	mut body_stmts := get_encode_json_base_stmts(mut self)
 	for field in stmt.fields {
-		body_stmts << set_value_stmt(mut self, field)
+		body_stmts << set_value_stmt_or_skip(mut self, field)
 	}
 	body_stmts << ast.Stmt(
 		ast.Return{
@@ -78,7 +79,90 @@ fn get_encode_json_base_stmts(mut self Codegen) []ast.Stmt {
 	]
 }
 
-fn set_value_stmt(mut self Codegen, field ast.StructField) ast.Stmt {
+// ISSUE: https://github.com/vlang/v/issues/6717
+// I should use optional field when it will be available
+fn ser_json_should_skip(self Codegen, field ast.StructField) bool {
+	if field.attrs.contains(attr_skip_if_default) {
+		if field.default_expr is ast.EmptyExpr {
+			// dump(field)
+			if !self.table.get_type_symbol(field.typ).is_builtin() {
+				dump(field.name)
+				$if print_issue ? {
+					eprintln('ISSUE: optional field! $field.name')
+				}
+				// panic('$field.name has attr `$attr_skip_if_default` but has no default_expr!!')
+				return false // FIXME: optional field is not implemented yet. Walkaround would be add skip_variant for Enum
+			}
+		}
+		return true
+	}
+	return false
+}
+
+fn ser_json_get_default_expr(self Codegen, typ ast.Type) ast.Expr {
+	// if self.table.get_type_symbol(typ).is_builtin() {
+	if int(typ) > ast.builtin_type_names.len - 1 {
+		if typ != ast.usize_type {
+			dump(typ)
+			ts := self.table.get_type_symbol(typ)
+			dump(ts.name)
+			dump(ts.info)
+			panic('typ should be builtin type')
+		}
+	}
+	match typ {
+		ast.i8_type {
+			return codegen.integer_literal(-i8(u8(-1) / 2))
+		}
+		ast.i16_type {
+			return codegen.integer_literal(-i16(u16(-1) / 2))
+		}
+		ast.int_type {
+			return codegen.integer_literal(-int(int(-1) / 2))
+		}
+		ast.i64_type {
+			return codegen.integer_literal(-i64(u64(-1) / 2))
+		}
+		ast.isize_type {
+			return codegen.integer_literal(-isize(usize(-1) / 2))
+		}
+		ast.byte_type {
+			return codegen.integer_literal(byte(-1))
+		}
+		ast.u8_type {
+			return codegen.integer_literal(u8(-1))
+		}
+		ast.u16_type {
+			return codegen.integer_literal(u16(-1))
+		}
+		ast.u32_type {
+			return codegen.integer_literal(u32(-1))
+		}
+		ast.u64_type {
+			return codegen.integer_literal(u64(-1))
+		}
+		ast.usize_type {
+			return codegen.integer_literal(usize(-1))
+		}
+		ast.f32_type {
+			return codegen.float_literal(-1.0)
+		}
+		ast.f64_type {
+			return codegen.float_literal(-1.0)
+		}
+		ast.bool_type {
+			return codegen.bool_literal(false)
+		}
+		ast.string_type {
+			return codegen.string_literal('')
+		}
+		else {
+			panic('unsupported builtin type')
+		}
+	}
+}
+
+fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 	field_name := field.name
 	js_field_name := get_js_field_name(field)
 	typ := field.typ
@@ -91,7 +175,7 @@ fn set_value_stmt(mut self Codegen, field ast.StructField) ast.Stmt {
 
 	right := get_type_recursively(mut self, field, field_sel, typ)
 
-	return ast.AssignStmt{
+	assign_stmt := ast.AssignStmt{
 		left: [ast.Expr(ast.IndexExpr{
 			index: self.string_literal(js_field_name)
 			left: self.ident(ser_json.json2_map_name)
@@ -99,17 +183,53 @@ fn set_value_stmt(mut self Codegen, field ast.StructField) ast.Stmt {
 		right: [right]
 		op: token.Kind.assign
 	}
+	if !ser_json_should_skip(self, field) {
+		return assign_stmt
+	}
+
+	default_expr := if field.default_expr is ast.EmptyExpr {
+		ser_json_get_default_expr(self, field.typ)
+	} else {
+		field.default_expr
+	}
+	if_expr := ast.IfExpr {
+		branches: [
+			ast.IfBranch {
+				scope: self.scope()
+				// if status == 0 {
+				cond: ast.Expr(
+					ast.InfixExpr{
+						op: token.Kind.eq
+						left: field_sel
+						right: default_expr
+					}
+				)
+				stmts: []
+			},
+			ast.IfBranch{
+				scope: self.scope()
+				stmts: [ast.Stmt(assign_stmt)]
+			}
+		]
+		is_expr: false
+		has_else: true
+	}
+	return ast.ExprStmt{
+		expr: if_expr
+	}
 }
 fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.Expr, typ ast.Type) ast.Expr {
 	// fallback to parent type, if type has no `str` method
 	mut type_sym := self.table.get_type_symbol(typ)
-	if type_sym.name == 'Symbol' {
-		dump('type_sym')
-		println(type_sym)
-		println(type_sym.name)
-		println(type_sym.info)
-		println(type_sym.has_method(encode_json_member_name))
-		println(type_sym.has_method('str'))
+	$if debug_ser_json ? {
+		if type_sym.name == 'Symbol' {
+			dump('type_sym')
+			println(type_sym)
+			println(type_sym.name)
+			println(type_sym.info)
+			println(type_sym.has_method(encode_json_member_name))
+			println(type_sym.has_method('str'))
+		}
 	}
 	mut has_ser_json_method := false
 	mut has_str_method := false

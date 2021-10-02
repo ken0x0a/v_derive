@@ -31,10 +31,11 @@ mut:
 
 // generates
 // ```vlang
-// fn (self Enum) to_json() string {
-// 	return match self {
-// 		.one { 'ONE' }
-// 		else { error('Unexpected value $self') }
+// fn macro_deser_json__my_enum(j json2.Any) ?MyEnum {
+// 	str := j.str()
+// 	match str {
+// 		'ONE' { return MyEnum.one }
+// 		else { return error('Unexpected value $self') }
 // 	}
 // }
 // ```
