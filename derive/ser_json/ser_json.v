@@ -81,7 +81,7 @@ fn get_encode_json_base_stmts(mut self Codegen) []ast.Stmt {
 
 // ISSUE: https://github.com/vlang/v/issues/6717
 // I should use optional field when it will be available
-fn ser_json_should_skip(self Codegen, field ast.StructField) bool {
+pub fn ser_json_should_skip(self Codegen, field ast.StructField) bool {
 	if field.attrs.contains(attr_skip_if_default) {
 		if field.default_expr is ast.EmptyExpr {
 			// dump(field)
@@ -99,14 +99,14 @@ fn ser_json_should_skip(self Codegen, field ast.StructField) bool {
 	return false
 }
 
-fn ser_json_get_default_expr(self Codegen, typ ast.Type) ast.Expr {
+pub fn ser_json_get_default_expr(typ ast.Type) ast.Expr {
 	// if self.table.get_type_symbol(typ).is_builtin() {
 	if int(typ) > ast.builtin_type_names.len - 1 {
 		if typ != ast.usize_type {
 			dump(typ)
-			ts := self.table.get_type_symbol(typ)
-			dump(ts.name)
-			dump(ts.info)
+			// ts := self.table.get_type_symbol(typ)
+			// dump(ts.name)
+			// dump(ts.info)
 			panic('typ should be builtin type')
 		}
 	}
@@ -188,7 +188,7 @@ fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 	}
 
 	default_expr := if field.default_expr is ast.EmptyExpr {
-		ser_json_get_default_expr(self, field.typ)
+		ser_json_get_default_expr(field.typ)
 	} else {
 		field.default_expr
 	}

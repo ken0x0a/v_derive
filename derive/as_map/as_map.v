@@ -4,6 +4,7 @@ import v.ast
 import v.token
 import term
 import tool.codegen.codegen { Codegen }
+import tool.codegen.derive.ser_json { ser_json_should_skip, ser_json_get_default_expr }
 
 pub const (
 	name_as_http_params    = 'AsHttpParams'
@@ -36,8 +37,7 @@ pub fn add_as_http_params_fn_for_struct(mut self Codegen, stmt ast.StructDecl) {
 	})
 
 	for field in stmt.fields {
-		js_field_name := get_js_field_name(field)
-		body_stmts << set_value_stmt(mut self, field.name, js_field_name, field.typ)
+		body_stmts << set_value_stmt_or_skip(mut self, field)
 	}
 
 	body_stmts << ast.Stmt(ast.Return{
@@ -57,14 +57,18 @@ pub fn add_as_http_params_fn_for_struct(mut self Codegen, stmt ast.StructDecl) {
 	)
 }
 
-fn set_value_stmt(mut self Codegen, field_name string, js_field_name string, typ ast.Type) ast.Stmt {
-	field := ast.SelectorExpr{ // 'self.field'
+fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
+	field_name := field.name
+	js_field_name := get_js_field_name(field)
+	typ := field.typ
+
+	field_sel_expr := ast.SelectorExpr{ // 'self.field'
 		field_name: field_name
 		expr: self.ident('self')
 		scope: self.scope()
 	}
 	right := if typ == ast.string_type {
-		ast.Expr(field)
+		ast.Expr(field_sel_expr)
 	} else if self.table.get_type_symbol(typ).has_method('str') {
 		mut type_sym := self.table.get_type_symbol(typ)
 		print(field_name)
@@ -72,7 +76,7 @@ fn set_value_stmt(mut self Codegen, field_name string, js_field_name string, typ
 
 		ast.Expr(ast.CallExpr{
 			name: 'str'
-			left: field
+			left: field_sel_expr
 			scope: self.scope()
 			is_method: true
 		})
@@ -106,10 +110,10 @@ fn set_value_stmt(mut self Codegen, field_name string, js_field_name string, typ
 		// dump(type_sym.info)
 		match type_sym.info {
 			ast.Map {
-				ast.Expr(field)
+				ast.Expr(field_sel_expr)
 			}
 			ast.Array {
-				// field.map(it.str()).join('')
+				// field_sel_expr.map(it.str()).join('')
 				ast.Expr(ast.CallExpr{
 					name: 'join'
 					args: [ast.CallArg{ expr: self.string_literal('') }]
@@ -123,7 +127,7 @@ fn set_value_stmt(mut self Codegen, field_name string, js_field_name string, typ
 								is_method: true
 							}
 						}]
-						left: field
+						left: field_sel_expr
 						scope: self.scope()
 						is_method: true
 					}
@@ -134,7 +138,7 @@ fn set_value_stmt(mut self Codegen, field_name string, js_field_name string, typ
 			ast.Enum {
 				ast.Expr(ast.CallExpr{
 					name: 'str'
-					left: field
+					left: field_sel_expr
 					scope: self.scope()
 					is_method: true
 				})
@@ -145,20 +149,50 @@ fn set_value_stmt(mut self Codegen, field_name string, js_field_name string, typ
 
 				ast.Expr(ast.CallExpr{
 					name: 'str'
-					left: field
+					left: field_sel_expr
 					scope: self.scope()
 					is_method: true
 				})
 			}
 		}
 	}
-	return ast.AssignStmt{
+	assign_stmt := ast.AssignStmt{
 		left: [ast.Expr(ast.IndexExpr{
 			index: self.string_literal(js_field_name)
 			left: self.ident(json2_map_name)
 		})]
 		right: [right]
 		op: token.Kind.assign
+	}
+	if !ser_json_should_skip(self, field) {
+		return assign_stmt
+	}
+
+	default_expr := if field.default_expr is ast.EmptyExpr {
+		ser_json_get_default_expr(field.typ)
+	} else {
+		field.default_expr
+	}
+	if_expr := ast.IfExpr {
+		branches: [
+			ast.IfBranch {
+				scope: self.scope()
+				// if status == 0 {
+				cond: ast.Expr(
+					ast.InfixExpr{
+						op: token.Kind.ne
+						left: field_sel_expr
+						right: default_expr
+					}
+				)
+				stmts: [ast.Stmt(assign_stmt)]
+			}
+		]
+		is_expr: false
+		has_else: false
+	}
+	return ast.ExprStmt{
+		expr: if_expr
 	}
 }
 
