@@ -6,6 +6,7 @@ import tool.codegen.macro { Macro, Derive, Custom }
 import tool.codegen.derive.deser_json
 import tool.codegen.derive.as_map
 import tool.codegen.derive.ser_json
+import tool.codegen.derive.clone as derive_clone
 import tool.codegen.codegen {Codegen}
 
 pub type GenCodeDecl = FnDecl | StructDecl | EnumDecl
@@ -62,6 +63,9 @@ pub fn gen_derive_for_enum(mut gen Codegen, macro_name string, decl EnumDecl) {
 }
 pub fn gen_derive_for_struct(mut gen Codegen, macro_name string, decl StructDecl) {
 	match macro_name {
+		derive_clone.name_as_http_params {
+			derive_clone.add_derive(mut gen, decl)
+		}
 		as_map.name_as_http_params {
 			as_map.add_as_http_params_fn_for_struct(mut gen, decl)
 		}
