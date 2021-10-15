@@ -317,7 +317,7 @@ pub fn (mut self Codegen) add_struct_method(opt GenStructMethodOpt) {
 	// dump(type_sym)
 
 	if opt.is_mut {
-		typ = typ.to_ptr()
+		typ = typ.ref()
 	}
 
 	mut params := opt.params[..]

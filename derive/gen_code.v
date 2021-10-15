@@ -63,7 +63,7 @@ pub fn gen_derive_for_enum(mut gen Codegen, macro_name string, decl EnumDecl) {
 }
 pub fn gen_derive_for_struct(mut gen Codegen, macro_name string, decl StructDecl) {
 	match macro_name {
-		derive_clone.name_as_http_params {
+		derive_clone.macro_name {
 			derive_clone.add_derive(mut gen, decl)
 		}
 		as_map.name_as_http_params {
