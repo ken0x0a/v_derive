@@ -28,7 +28,7 @@ fn test_gen_fn() {
 	mut table := ast.new_table()
 
 	mut gen := Codegen{
-		tbl: table
+		table: table
 		file: file
 		no_main: true
 	}
@@ -38,5 +38,4 @@ fn test_gen_fn() {
 	res := fmt.fmt(file, table, &pref.Preferences{}, false)
 
 	assert res == answer
-
 }
