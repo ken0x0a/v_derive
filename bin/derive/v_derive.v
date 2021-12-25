@@ -17,10 +17,15 @@ fn main() {
 		exit(1)
 	}
 	mut filename := os.args[1]
+	output_file := if os.args.len > 2 {
+		os.args[2]
+	} else {
+		'generated_by_derive.v'
+	}
 	mut files := []string{}
 	outdir := if os.is_dir(filename) {
 		dirname := filename
-		files = os.walk_ext(filename, '.v').filter(!it.ends_with(os.args[2]))
+		files = os.walk_ext(filename, '.v').filter(!it.ends_with(output_file))
 
 		filename = files.pop()
 		dirname
@@ -50,8 +55,8 @@ fn main() {
 		derive_code_for_stmts(mut gen, parsed_file)
 	}
 
-	if os.args.len > 2 {
-		out_path := os.join_path(outdir, os.args[2])
+	if output_file != '-' {
+		out_path := os.join_path(outdir, output_file)
 		print('Generating ')
 		print(term.green(out_path))
 		print(' ...')
