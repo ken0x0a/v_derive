@@ -22,7 +22,7 @@ fn register_map_fn_if_not_exist(mut self Codegen, typ ast.Type, typ_arg string, 
 	if fn_name in self.table.fns {
 		eprintln('"$fn_name" is already registered')
 	} else {
-		typ_sym := self.table.get_type_symbol(typ)
+		typ_sym := self.table.sym(typ)
 		body_stmts := [
 			// obj := j.as_map()
 			ast.Stmt(ast.AssignStmt{

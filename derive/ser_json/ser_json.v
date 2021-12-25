@@ -85,7 +85,7 @@ pub fn ser_json_should_skip(self Codegen, field ast.StructField) bool {
 	if field.attrs.contains(attr_skip_if_default) {
 		if field.default_expr is ast.EmptyExpr {
 			// dump(field)
-			if !self.table.get_type_symbol(field.typ).is_builtin() {
+			if !self.table.sym(field.typ).is_builtin() {
 				dump(field.name)
 				$if print_issue ? {
 					eprintln('ISSUE: optional field! $field.name')
@@ -100,11 +100,11 @@ pub fn ser_json_should_skip(self Codegen, field ast.StructField) bool {
 }
 
 pub fn ser_json_get_default_expr(typ ast.Type) ast.Expr {
-	// if self.table.get_type_symbol(typ).is_builtin() {
+	// if self.table.sym(typ).is_builtin() {
 	if int(typ) > ast.builtin_type_names.len - 1 {
 		if typ != ast.usize_type {
 			dump(typ)
-			// ts := self.table.get_type_symbol(typ)
+			// ts := self.table.sym(typ)
 			// dump(ts.name)
 			// dump(ts.info)
 			panic('typ should be builtin type')
@@ -216,7 +216,7 @@ fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 }
 fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.Expr, typ ast.Type) ast.Expr {
 	// fallback to parent type, if type has no `str` method
-	mut type_sym := self.table.get_type_symbol(typ)
+	mut type_sym := self.table.sym(typ)
 	$if debug_ser_json ? {
 		if type_sym.name == 'Symbol' {
 			dump('type_sym')
@@ -240,7 +240,7 @@ fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.E
 		}
 		info := type_sym.info
 		if info is ast.Alias {
-			type_sym = self.table.get_type_symbol(info.parent_type)
+			type_sym = self.table.sym(info.parent_type)
 			$if debug {
 				println(term.red(type_sym.name))
 				dump(type_sym.name)
@@ -324,7 +324,7 @@ fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.E
 				// 	dump(info)
 				// }
 
-				// elem_type_sym := self.table.get_type_symbol(type_sym.info.elem_type)
+				// elem_type_sym := self.table.sym(type_sym.info.elem_type)
 				
 				// match elem_type_sym.info {
 

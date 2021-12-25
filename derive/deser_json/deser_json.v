@@ -85,7 +85,7 @@ fn set_field_stmt(mut self Codegen, field_name string, js_field_name string, typ
 
 fn get_assign_right_expr(mut self Codegen, field_name string, js_field_name string, typ ast.Type) ast.Expr {
 	if typ > ast.builtin_type_names.len {
-		type_sym := self.table.get_type_symbol(typ)
+		type_sym := self.table.sym(typ)
 		if type_sym.name.starts_with('map[string]') {
 			// map
 			// type_arg := type_sym.name.split_nth(']', 2)[1]

@@ -19,7 +19,7 @@ fn (mut self DeserJsonFn) gen() {
 	return_stmt := ast.Return{
 		exprs: [
 			ast.Expr(ast.StructInit{
-				// typ: self.table.get_type_symbol(self.table.type_idxs[stmt.name])
+				// typ: self.table.sym(self.table.type_idxs[stmt.name])
 				typ: self.gen.find_type_or_add_placeholder(stmt.name, .v)
 				fields: stmt.fields.map(self.gen_struct_init_field(it))
 				// fields: [
@@ -86,13 +86,13 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 	field_name := field.name
 	js_field_name := get_js_field_name(field)
 	typ := field.typ // BUG? `u8` is not parsed properly => `def.u8`
-	// if self.table.get_type_symbol(typ).name.split('.').last() == 'u8' { panic("Don't use `u8` as it doesn't parsed properly") }
+	// if self.table.sym(typ).name.split('.').last() == 'u8' { panic("Don't use `u8` as it doesn't parsed properly") }
 	is_required := is_field_required(&field)
 
 	mut self := inst.gen
 	// dump(ast.builtin_type_names.len)
-	if !self.table.get_type_symbol(typ).is_builtin() {
-		type_sym := self.table.get_type_symbol(typ)
+	if !self.table.sym(typ).is_builtin() {
+		type_sym := self.table.sym(typ)
 		map_depth := get_map_depth(type_sym.name)
 		if map_depth > 0 {
 			// impl_code_for_map_depth_if_required(depth, typ)
@@ -219,7 +219,7 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 	} else if field.attrs.contains(attr_json2_as) {
 		// .${method_name_josn2}().${method_name_chain}()
 		method_name_josn2 := field.attrs.filter(it.name == attr_json2_as)[0].arg
-		method_name_chain := self.table.get_type_symbol(typ).name
+		method_name_chain := self.table.sym(typ).name
 		return ast.Expr(ast.CallExpr{
 			scope: self.scope()
 			is_method: true

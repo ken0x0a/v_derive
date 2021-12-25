@@ -24,7 +24,7 @@ fn get_deser_array_expr_recursively(mut self Codegen, field ast.Expr, typ ast.Ty
 }
 
 fn get_deser_array_expr(mut self Codegen, typ ast.Type, js_field_name string) ast.Expr {
-	type_sym := self.table.get_type_symbol(typ)
+	type_sym := self.table.sym(typ)
 	depth, type_arg := get_array_depth_and_type_arg(type_sym.name)
 	if depth != 1 {
 		dump(type_arg)
@@ -112,7 +112,7 @@ fn register_array_fn_if_not_exist(mut self Codegen, typ ast.Type, typ_arg string
 	if fn_name in self.table.fns {
 		eprintln('"$fn_name" is already registered')
 	} else {
-		typ_sym := self.table.get_type_symbol(typ)
+		typ_sym := self.table.sym(typ)
 		body_stmts := [
 			// obj := j.as_map()
 			ast.Stmt(ast.AssignStmt{

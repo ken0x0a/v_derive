@@ -313,7 +313,7 @@ pub fn (mut self Codegen) add_struct_method(opt GenStructMethodOpt) {
 	} else {
 		ast.new_type(typ_idx)
 	}
-	mut type_sym := self.table.get_type_symbol(typ_idx)
+	mut type_sym := self.table.sym(typ_idx)
 	// dump(type_sym)
 
 	if opt.is_mut {

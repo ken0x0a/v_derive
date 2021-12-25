@@ -69,8 +69,8 @@ fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 	}
 	right := if typ == ast.string_type {
 		ast.Expr(field_sel_expr)
-	} else if self.table.get_type_symbol(typ).has_method('str') {
-		mut type_sym := self.table.get_type_symbol(typ)
+	} else if self.table.sym(typ).has_method('str') {
+		mut type_sym := self.table.sym(typ)
 		print(field_name)
 		dump(type_sym.name)
 
@@ -81,12 +81,12 @@ fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 			is_method: true
 		})
 	} else {
-		mut type_sym := self.table.get_type_symbol(typ)
+		mut type_sym := self.table.sym(typ)
 		info := type_sym.info
 		// ISSUE: https://github.com/vlang/v/issues/9419
 		_ := match info {
 			ast.Alias {
-				type_sym = self.table.get_type_symbol(info.parent_type)
+				type_sym = self.table.sym(info.parent_type)
 				_ = $if debug {
 					println(term.red(type_sym.name))
 					dump(type_sym.name)
@@ -99,7 +99,7 @@ fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 			else {true} // ISSUE: 9419
 		}
 		// if info is ast.Alias {
-		// 	type_sym = self.table.get_type_symbol(info.parent_type)
+		// 	type_sym = self.table.sym(info.parent_type)
 		// 	println(term.red(type_sym.name))
 		// 	dump(type_sym.name)
 		// }
