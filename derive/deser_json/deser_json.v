@@ -5,7 +5,7 @@ import v.token
 import codegen { Codegen }
 
 pub const (
-	macro_name = 'Deser_json'
+	macro_name = 'DeserJson'
 	attr = 'deser_json'
 	attr_with = 'deser_json_with'
 	attr_json2_as = 'deser_json_as'

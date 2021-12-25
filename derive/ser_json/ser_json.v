@@ -6,7 +6,7 @@ import term
 import codegen { Codegen }
 
 pub const (
-	macro_name = 'Ser_json'
+	macro_name = 'SerJson'
 	attr_json2_as = 'ser_json_as'
 	attr_skip_if_default = 'ser_json_skip_if_default'
 )
