@@ -19,6 +19,7 @@ struct Item {
 }
 
 // in other file
+import x.json2
 
 input := '{"name":"Cool Stuff","price":999.9}'
 j := json2.raw_decode(input) ?
