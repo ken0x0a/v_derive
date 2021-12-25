@@ -1,7 +1,6 @@
 module util
 
 import v.ast
-import term
 
 // https://github.com/vlang/v/blob/master/vlib/v/ast/types.v#L419
 pub fn str_to_type(typ string) ast.Type {
@@ -137,6 +136,7 @@ pub fn debug_stmt(stmt ast.Stmt) {
 	// 	ast.TypeDecl { println(stmt) }
 	// }
 }
+
 pub fn debug_expr(expr ast.Expr) {
 	println(expr)
 	// match expr {
@@ -190,7 +190,7 @@ pub fn debug_expr(expr ast.Expr) {
 	// 	ast.TypeNode { println(expr) }
 	// 	ast.TypeOf { println(expr) }
 	// 	ast.UnsafeExpr { println(expr) }
-	// 	else { 
+	// 	else {
 	// 		eprint(term.red('unsupported type'))
 	// 		eprintln(expr.type_name())
 	// 		println(expr)

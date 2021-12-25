@@ -11,7 +11,7 @@ import codegen {Codegen}
 
 pub type GenCodeDecl = FnDecl | StructDecl | EnumDecl
 
-pub fn gen_code(mut gen Codegen, macro Macro, decl GenCodeDecl) string {
+pub fn gen_code(mut gen Codegen, macro Macro, decl GenCodeDecl) {
 	match decl {
 		ast.StructDecl {
 			match macro {
@@ -43,7 +43,6 @@ pub fn gen_code(mut gen Codegen, macro Macro, decl GenCodeDecl) string {
 			}
 		}
 	}
-	return ''
 }
 
 pub fn gen_derive_for_enum(mut gen Codegen, macro_name string, decl EnumDecl) {
@@ -75,32 +74,11 @@ pub fn gen_derive_for_struct(mut gen Codegen, macro_name string, decl StructDecl
 		}
 		deser_json.macro_name {
 			gen.add_import_if_not_exist('x.json2')
-			// mut result := ''
-			// if is_sum_type {
-			// 	'json2.raw()'
-			// } else {
-				// pub fn (mut self ClassName) from_json(j json2.Any) {
-				// 	obj := j.as_map()
-				// 	self.field_name = obj[js_field_name].type()
-				// }
-				// deser_json.add_decode_json(mut gen, decl)
-				deser_json.add_decode_json_fn(mut gen, decl)
-				
-// 				mut table := ast.new_table()
-// 				mut fn_template := parser.parse_text('
-// module $mod_name
-// pub fn (mut self ClassName) from_json(j json2.Any) ? {
-// 	obj := j.as_map()
-// 	self.field_name = obj[js_field_name].type()
-// }
-// ', 'dummy.v', table, .parse_comments, &pref.Preferences{}).stmts[1]
-// 				for f in decl.fields {
-					
-// 				}
-			// }
-
-
+			// deser_json.add_decode_json(mut gen, decl)
+			deser_json.add_decode_json_fn(mut gen, decl)
 		}
-		else {}
+		else {
+			eprintln(term.red('Derive macro $macro_name is not supported for Struct'))
+		}
 	}
 }
