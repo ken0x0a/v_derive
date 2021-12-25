@@ -7,6 +7,18 @@ Pre-compile code generation for Vlang
 There is some options for customization, but not yet documented.
 See [examples](#Examples) for the basic usage.
 
+### Build
+```sh
+git clone https://github.com/ken0x0a/v_derive derive
+cd derive 
+v -o derive bin/derive
+```
+
+### Generate code
+```sh
+./derive <file_or_directory_name> [output_filename]
+```
+
 ## Examples
 
 See https://github.com/ken0x0a/v_derive_example
