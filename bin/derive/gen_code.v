@@ -1,4 +1,4 @@
-module derive
+module main
 
 import v.ast { FnDecl, StructDecl, EnumDecl }
 import term

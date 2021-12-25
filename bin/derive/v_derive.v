@@ -7,7 +7,6 @@ import os
 import term
 import codegen {Codegen}
 import macro {Macro, Derive}
-import derive
 import derive.deser_json
 
 fn main() {
@@ -68,13 +67,13 @@ fn derive_code_for_stmts(mut gen Codegen, parsed ast.File) {
 		if stmt is ast.StructDecl {
 			macros := get_macros(&stmt)
 			for macro in macros {
-				derive.gen_code(mut gen, macro, derive.GenCodeDecl(stmt as ast.StructDecl))
+				gen_code(mut gen, macro, GenCodeDecl(stmt as ast.StructDecl))
 			}
 		}
 		if stmt is ast.EnumDecl {
 			macros := get_macros(&stmt)
 			for macro in macros {
-				derive.gen_code(mut gen, macro, derive.GenCodeDecl(stmt as ast.EnumDecl))
+				gen_code(mut gen, macro, GenCodeDecl(stmt as ast.EnumDecl))
 			}
 		}
 
