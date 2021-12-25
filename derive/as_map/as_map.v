@@ -3,8 +3,8 @@ module as_map
 import v.ast
 import v.token
 import term
-import tool.codegen.codegen { Codegen }
-import tool.codegen.derive.ser_json { ser_json_should_skip, ser_json_get_default_expr }
+import codegen { Codegen }
+import derive.ser_json { ser_json_should_skip, ser_json_get_default_expr }
 
 pub const (
 	name_as_http_params    = 'AsHttpParams'

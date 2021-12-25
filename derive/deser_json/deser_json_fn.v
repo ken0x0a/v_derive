@@ -1,7 +1,7 @@
 module deser_json
 
 import v.ast
-import tool.codegen.codegen { Codegen }
+import codegen { Codegen }
 
 struct DeserJsonFn {
 mut:

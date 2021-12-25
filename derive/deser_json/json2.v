@@ -1,7 +1,7 @@
 module deser_json
 
 import v.ast
-import tool.codegen.codegen as cg
+import codegen as cg
 
 fn get_json2_method_name(typ ast.Type) (string, ast.Type) {
 	mut cast_type := ast.Type(0)

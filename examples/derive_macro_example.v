@@ -9,9 +9,9 @@ import v.parser
 import os
 import json
 import term
-import tool.codegen.util {str_to_type}
-import tool.codegen.codegen {Codegen}
-import tool.codegen.derive.deser_json {add_decode_json}
+import util {str_to_type}
+import codegen {Codegen}
+import derive.deser_json {add_decode_json}
 
 fn main() {
 	// file_def := parse_code()

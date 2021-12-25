@@ -3,7 +3,7 @@ module deser_json
 import v.ast
 import v.token
 import term
-import tool.codegen.codegen { Codegen }
+import codegen { Codegen }
 
 const enum_rename_set = ['snake_case', 'UPPER_CASE', 'PascalCase', 'camelCase', 'kebab-case', 'SCREAMING-KEBAB-CASE', 'repr']
 

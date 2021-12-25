@@ -5,8 +5,8 @@ import v.ast
 import v.fmt
 import v.pref
 import v.parser
-import tool.codegen.util {str_to_type}
-import tool.codegen.codegen {Codegen}
+import util {str_to_type}
+import codegen {Codegen}
 import term
 
 fn main() {

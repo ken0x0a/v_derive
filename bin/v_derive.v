@@ -5,10 +5,10 @@ import v.pref
 import v.parser
 import os
 import term
-import tool.codegen.codegen {Codegen}
-import tool.codegen.macro {Macro, Derive}
-import tool.codegen.derive
-import tool.codegen.derive.deser_json
+import codegen {Codegen}
+import macro {Macro, Derive}
+import derive
+import derive.deser_json
 
 fn main() {
 	if os.args.len == 1 {

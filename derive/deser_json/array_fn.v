@@ -2,7 +2,7 @@ module deser_json
 
 import v.ast
 import v.token
-import tool.codegen.codegen { Codegen }
+import codegen { Codegen }
 
 fn get_array_depth_and_type_arg(type_name string) (int, string) {
 	mut temp := type_name

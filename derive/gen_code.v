@@ -2,12 +2,12 @@ module derive
 
 import v.ast { FnDecl, StructDecl, EnumDecl }
 import term
-import tool.codegen.macro { Macro, Derive, Custom }
-import tool.codegen.derive.deser_json
-import tool.codegen.derive.as_map
-import tool.codegen.derive.ser_json
-import tool.codegen.derive.clone as derive_clone
-import tool.codegen.codegen {Codegen}
+import macro { Macro, Derive, Custom }
+import derive.deser_json
+import derive.as_map
+import derive.ser_json
+import derive.clone as derive_clone
+import codegen {Codegen}
 
 pub type GenCodeDecl = FnDecl | StructDecl | EnumDecl
 

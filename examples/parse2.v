@@ -7,7 +7,7 @@ import v.pref
 import v.token
 import v.parser
 import term
-import tool.codegen.util {debug_stmt, str_from_type}
+import util {debug_stmt, str_from_type}
 
 [inline]
 pub fn is_comment(stmt ast.Stmt) bool {

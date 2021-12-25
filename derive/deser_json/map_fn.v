@@ -2,7 +2,7 @@ module deser_json
 
 import v.ast
 import v.token
-import tool.codegen.codegen { Codegen }
+import codegen { Codegen }
 
 fn get_map_depth(type_name string) int {
 	mut temp := type_name

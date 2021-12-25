@@ -2,7 +2,7 @@ module ser_json
 
 import v.ast
 import term
-import tool.codegen.codegen { Codegen }
+import codegen { Codegen }
 
 enum EnumRename {
 	snake_case

@@ -2,7 +2,7 @@ module deser_json
 
 // import v.ast
 // import v.token
-// import tool.codegen.codegen {Codegen}
+// import codegen {Codegen}
 
 // // [inline]
 // // fn ${decode_json_pub_fn_prefix}__map__cb<T>(src string, cb fn(json2.Any) T) ?map[string]T {

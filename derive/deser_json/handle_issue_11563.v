@@ -2,7 +2,7 @@ module deser_json
 
 import v.ast
 import v.token
-import tool.codegen.codegen { Codegen }
+import codegen { Codegen }
 
 const issue_11563_if_guard_var_name = 'k'
 // https://github.com/vlang/v/issues/11563

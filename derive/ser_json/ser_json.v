@@ -3,7 +3,7 @@ module ser_json
 import v.ast
 import v.token
 import term
-import tool.codegen.codegen { Codegen }
+import codegen { Codegen }
 
 pub const (
 	macro_name = 'Ser_json'

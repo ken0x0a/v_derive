@@ -2,7 +2,7 @@ module deser_json
 
 import v.pref
 import v.parser
-import tool.codegen.codegen { Codegen }
+import codegen { Codegen }
 
 pub fn add_template_stmts(mut gen Codegen, mod_name string) {
 	decode_json_fn_str := 'module $mod_name

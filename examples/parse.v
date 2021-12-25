@@ -10,8 +10,8 @@ import v.scanner
 import term
 import os
 import json
-import tool.codegen.macro
-import tool.codegen.util {debug_stmt, str_from_type}
+import macro
+import util {debug_stmt, str_from_type}
 
 [inline]
 pub fn is_comment(stmt ast.Stmt) bool {

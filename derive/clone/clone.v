@@ -1,7 +1,7 @@
 module clone
 
 import v.ast
-import tool.codegen.codegen {Codegen}
+import codegen {Codegen}
 
 pub const (
 	macro_name = 'Clone'
