@@ -1,7 +1,7 @@
 name: V Compatibility Check!
 on:
   schedule:
-    - cron: '*/2 * * * *'
+    - cron: '21,51 * * * *'
 
 env:
   REPO_DIR: repo
