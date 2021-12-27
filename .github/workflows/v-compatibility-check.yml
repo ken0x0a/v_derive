@@ -1,11 +1,7 @@
 name: V Compatibility Check!
 on:
-  # schedule:
-  #   - cron: '*/2 * * * *'
-  push:
-    branches:
-      - "ghwf"
-      # - "main"
+  schedule:
+    - cron: '*/2 * * * *'
 
 env:
   REPO_DIR: repo
