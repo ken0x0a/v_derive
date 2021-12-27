@@ -1,0 +1,108 @@
+name: V Compatibility Check!
+on:
+  # schedule:
+  #   - cron: '*/2 * * * *'
+  push:
+    branches:
+      - "ghwf"
+      # - "main"
+
+env:
+  REPO_DIR: repo
+  HASH_STATE_FILE: last_hash
+
+jobs:
+  check-hash:
+    name: Check HASH
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.v_latest_hash.outputs.changed || steps.s2.output.changed }}
+      hash: ${{ steps.v_latest_hash.outputs.value || steps.s2.output.value }}
+    steps:
+      - name: Load latest hash
+        id: last-hash
+        uses: actions/cache@v2
+        with:
+          path: ./${{ env.HASH_STATE_FILE }}
+          key: key-${{ env.HASH_STATE_FILE }}
+      # Only for the 1st run.
+      - name: Create state file
+        if: steps.last-hash.outputs.cache-hit != 'true'
+        run: echo -n 'a' > ./${{ env.HASH_STATE_FILE }}
+      - name: Get V repo latest hash
+        id: v_latest_hash
+        run: |
+          the_last_hash=$(git ls-remote https://github.com/vlang/v.git master | awk '{ print $1 }')
+          echo "::set-output name=value::$(the_last_hash)"
+          if [ $the_last_hash != $(cat ./${{ env.HASH_STATE_FILE }}) ]; then 
+            echo "::set-output name=changed::true"
+          fi
+        timeout-minutes: 1
+      - name: fallback s1
+        if: steps.v_latest_hash.conclusion == 'failure'
+        uses: actions/checkout@v2
+        with:
+          repository: vlang/v
+          path: v
+      - name: fallback s2
+        id: s2
+        if: steps.v_latest_hash.conclusion == 'failure'
+        run: |
+          the_last_hash=$(git rev-parse HEAD)
+          echo "::set-output name=value::$(the_last_hash)"
+          if [ $the_last_hash != $(cat ./${{ env.HASH_STATE_FILE }}) ]; then 
+            echo "::set-output name=changed::true"
+          fi
+
+  compat-check:
+    # As this action is for checking V. compatibility,
+    # no need to run further jobs if V repo doesn't changed.
+    needs: [check-hash]
+    # if: needs.check-hash.steps.is-last-hash.outputs.cache-hit != 'true'
+    if: needs.check-hash.outputs.changed == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Load latest hash
+        id: last-hash
+        uses: actions/cache@v2
+        with:
+          path: ./${{ env.HASH_STATE_FILE }}
+          key: key-${{ env.HASH_STATE_FILE }}
+      - name: \[pre] V (checkout)
+        uses: actions/checkout@v2
+        with:
+          repository: vlang/v
+          path: v
+      - name: \[pre] V (build) (linux)
+        if: ${{ matrix.os }} == 'ubuntu-latest'
+        run: make -j$(nproc)
+        working-directory: ./v
+      - name: \[pre] V (build) (macos)
+        if: ${{ matrix.os }} == 'macos-latest'
+        run: make -j$(sysctl -n hw.logicalcpu)
+        working-directory: ./v
+      - name: \[pre] V (symlink)
+        run: sudo ./v symlink
+        working-directory: ./v
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: ${{ env.REPO_DIR }}
+
+      - name: Build
+        run: v -o vderive bin/derive
+        working-directory: ${{ env.REPO_DIR }}
+      - name: Test (Generate Code)
+        run: ./vderive examples/simple
+        working-directory: ${{ env.REPO_DIR }}
+      - name: Test
+        run: v test examples/simple
+        working-directory: ${{ env.REPO_DIR }}
+
+      - name: Update state
+        run: echo -n "${{needs.check-hash.outputs.hash}}" > ./${{ env.HASH_STATE_FILE }}

@@ -34,7 +34,7 @@ jobs:
       - name: Build
         run: v -o vderive bin/derive
         working-directory: ${{ env.REPO_DIR }}
-      - name: Test
+      - name: Test (Generate Code)
         run: ./vderive examples/simple
         working-directory: ${{ env.REPO_DIR }}
       - name: Test
