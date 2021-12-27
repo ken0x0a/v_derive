@@ -23,7 +23,7 @@ v -o derive bin/derive
 
 See https://github.com/ken0x0a/v_derive_example
 
-```vlang
+```v ignore
 [derive: 'DeserJson, SerJson']
 struct Item {
 	name  string [required]
@@ -51,7 +51,8 @@ MPL-2.0 (is not viral)
 https://www.mozilla.org/en-US/MPL/2.0/
 
 I might change the license to MIT and/or Apache-2.0 in future.
-So, please give me the right to change license in the future for your contribution, in case you'll contribute.
+So, please give me the right to change license in the future for your contribution,
+in case you'll contribute.
 
 ## Contributing
 

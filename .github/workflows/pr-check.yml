@@ -1,0 +1,78 @@
+name: PR check!
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+env:
+  REPO_DIR: repo
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: \[pre] V (checkout)
+        uses: actions/checkout@v2
+        with:
+          repository: vlang/v
+          path: v
+      - name: \[pre] V (build) (linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: make -j$(nproc)
+        working-directory: ./v
+      - name: \[pre] V (build) (macos)
+        if: matrix.os == 'macos-latest'
+        run: make -j$(sysctl -n hw.logicalcpu)
+        working-directory: ./v
+      - name: \[pre] V (symlink)
+        run: sudo ./v symlink
+        working-directory: ./v
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: ${{ env.REPO_DIR }}
+
+      - name: Build
+        run: v -o vderive bin/derive
+        working-directory: ${{ env.REPO_DIR }}
+      - name: Test (Generate Code)
+        run: ./vderive examples/simple
+        working-directory: ${{ env.REPO_DIR }}
+      - name: Test
+        run: v test examples/simple
+        working-directory: ${{ env.REPO_DIR }}
+
+  fmt:
+    name: fmt
+    runs-on: ubuntu-latest
+    steps:
+      - name: \[pre] V (checkout)
+        uses: actions/checkout@v2
+        with:
+          repository: vlang/v
+          path: v
+      - name: \[pre] V (build)
+        run: |
+          make -j$(nproc)
+          sudo ./v symlink
+        working-directory: ./v
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: ${{ env.REPO_DIR }}
+
+      - name: format
+        run: v fmt -w .
+        working-directory: ${{ env.REPO_DIR }}
+      - name: Check modified
+        run: git diff --exit-code
+        working-directory: ${{ env.REPO_DIR }}

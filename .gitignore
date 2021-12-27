@@ -6,3 +6,6 @@ main
 *.so
 *.dylib
 *.dll
+
+generated_by_derive.v
+_docs
