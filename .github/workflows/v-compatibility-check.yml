@@ -78,11 +78,11 @@ jobs:
           repository: vlang/v
           path: v
       - name: \[pre] V (build) (linux)
-        if: ${{ matrix.os }} == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest'
         run: make -j$(nproc)
         working-directory: ./v
       - name: \[pre] V (build) (macos)
-        if: ${{ matrix.os }} == 'macos-latest'
+        if: matrix.os == 'macos-latest'
         run: make -j$(sysctl -n hw.logicalcpu)
         working-directory: ./v
       - name: \[pre] V (symlink)

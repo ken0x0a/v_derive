@@ -11,19 +11,27 @@ env:
 jobs:
   test:
     name: Test
-    runs-on: ubuntu-latest
-    # runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     steps:
       - name: \[pre] V (checkout)
         uses: actions/checkout@v2
         with:
           repository: vlang/v
           path: v
-      - name: \[pre] V (build)
-          # make -j$(sysctl -n hw.logicalcpu)
-        run: |
-          make -j$(nproc)
-          sudo ./v symlink
+      - name: \[pre] V (build) (linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: make -j$(nproc)
+        working-directory: ./v
+      - name: \[pre] V (build) (macos)
+        if: matrix.os == 'macos-latest'
+        run: make -j$(sysctl -n hw.logicalcpu)
+        working-directory: ./v
+      - name: \[pre] V (symlink)
+        run: sudo ./v symlink
         working-directory: ./v
 
       - name: Checkout
