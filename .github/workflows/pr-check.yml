@@ -2,9 +2,10 @@ name: PR check!
 on:
   push:
     branches:
-      - '*'
-      - '!main'
-      # - 'main'
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
 env:
   REPO_DIR: repo
 
