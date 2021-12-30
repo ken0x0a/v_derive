@@ -7,7 +7,7 @@ import os
 import term
 import codegen {Codegen}
 import macro {Macro, Derive}
-import derive.deser_json
+import derive.json.de as deser_json
 
 fn main() {
 	if os.args.len == 1 {

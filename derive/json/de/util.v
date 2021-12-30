@@ -1,4 +1,4 @@
-module deser_json
+module de
 
 fn to_snake_case(input string) string {
 	res := input.replace_each(['A', '_a', 'B', '_b', 'C', '_c', 'D', '_d', 'E', '_e', 'F', '_f',

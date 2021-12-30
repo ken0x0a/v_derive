@@ -3,9 +3,9 @@ module main
 import v.ast { FnDecl, StructDecl, EnumDecl }
 import term
 import macro { Macro, Derive, Custom }
-import derive.deser_json
+import derive.json.de as deser_json
 import derive.as_map
-import derive.ser_json
+import derive.json.ser as ser_json
 import derive.clone as derive_clone
 import codegen {Codegen}
 

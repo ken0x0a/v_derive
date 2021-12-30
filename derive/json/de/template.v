@@ -1,4 +1,4 @@
-module deser_json
+module de
 
 import v.pref
 import v.parser

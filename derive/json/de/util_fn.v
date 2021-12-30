@@ -1,4 +1,4 @@
-module deser_json
+module de
 
 fn get_struct_name_without_module(struct_name string) string {
 	mut name := struct_name
