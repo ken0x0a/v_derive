@@ -1,4 +1,4 @@
-module deser_json
+module de
 
 import v.ast
 import codegen { Codegen }

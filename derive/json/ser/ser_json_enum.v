@@ -1,4 +1,4 @@
-module ser_json
+module ser
 
 import v.ast
 import term
@@ -87,7 +87,7 @@ fn (mut self SerJsonEnum) add_impl() {
 	self.gen.add_struct_method(
 		struct_name: self.stmt.name.split('.').last()
 		is_mut: false
-		name: ser_json.encode_json_member_name
+		name: ser.encode_json_member_name
 		return_type: ast.string_type
 		body_stmts: body_stmts
 		params: []

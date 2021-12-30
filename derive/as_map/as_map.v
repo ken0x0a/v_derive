@@ -4,7 +4,7 @@ import v.ast
 import v.token
 import term
 import codegen { Codegen }
-import derive.ser_json { ser_json_should_skip, ser_json_get_default_expr }
+import derive.json.ser { ser_json_should_skip, ser_json_get_default_expr }
 
 pub const (
 	name_as_http_params    = 'AsHttpParams'
