@@ -12,12 +12,10 @@ pub struct Codegen {
 mut:
 	const_decl &ast.ConstDecl = voidptr(0)
 	no_main bool
-	scope      &ast.Scope     = &ast.Scope{
-		parent: 0
-	}
+	scope   &ast.Scope     = &ast.Scope{ parent: 0 }
 pub mut:
-	file       &ast.File
-	table        &ast.Table
+	file  &ast.File
+	table &ast.Table
 }
 
 pub fn (mut self Codegen) scope_into_child() {
@@ -40,11 +38,9 @@ pub struct NewPlainArgs {
 }
 pub struct NewWithAllArgs {
 	mod_name string
-	scope      &ast.Scope     = &ast.Scope{
-		parent: 0
-	}
-	file       &ast.File
-	table        &ast.Table
+	scope    &ast.Scope = &ast.Scope{ parent: 0 }
+	file     &ast.File
+	table    &ast.Table
 }
 pub struct NewWithTableArgs {
 	mod_name string
@@ -173,12 +169,14 @@ pub fn (mut self Codegen) gen_blank_stmt() ast.Stmt {
 }
 
 pub fn (mut self Codegen) add_struct_decl(opt ast.StructDecl) {
-		self.file.stmts << self.gen_struct_decl(opt)
+	self.file.stmts << self.gen_struct_decl(opt)
 }
+
 [inline]
 pub fn (mut self Codegen) gen_struct_decl(opt ast.StructDecl) ast.StructDecl {
 	return opt
 }
+
 [inline]
 pub fn (mut self Codegen) gen_struct(opt ast.Struct) ast.Struct {
 	return opt
@@ -199,8 +197,7 @@ pub struct GenStructFieldOpt {
 	attrs []ast.Attr
 }
 
-
-pub fn (mut self Codegen) add_stmt(stmt ast.Stmt)  {
+pub fn (mut self Codegen) add_stmt(stmt ast.Stmt) {
 	self.file.stmts << stmt
 }
 pub fn (mut self Codegen) gen_struct_field(opt GenStructFieldOpt) ast.StructField {
@@ -236,10 +233,12 @@ pub fn (mut self Codegen) add_expr_stmt(expr ast.Expr) {
 		expr: expr
 	}
 }
+
 // \u0001
 pub fn (mut self Codegen) add_comment_stmt(opt GenCommentOpt) {
 		self.file.stmts << self.gen_comment_stmt(opt)
 }
+
 // \u0001
 pub fn (mut self Codegen) gen_comment_stmt(opt GenCommentOpt) ast.Stmt {
 	return ast.ExprStmt{
@@ -268,6 +267,7 @@ pub fn (mut self Codegen) add_fn(opt GenFnDeclOpt) {
 	}
 	self.file.stmts << self.gen_fn(opt)
 }
+
 pub fn (mut self Codegen) gen_fn(opt GenFnDeclOpt) ast.Stmt {
 	return ast.FnDecl{
 		return_type: opt.return_type
