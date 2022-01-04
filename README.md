@@ -1,6 +1,9 @@
+
 # V Derive
 
 Pre-compile code generation for Vlang
+
+![Test](https://github.com/ken0x0a/v_derive/actions/workflows/v-compatibility-check.yml/badge.svg)
 
 ## Usage
 
