@@ -29,7 +29,7 @@ jobs:
         id: v_latest_hash
         run: |
           the_last_hash=$(git ls-remote https://github.com/vlang/v.git master | awk '{ print $1 }')
-          echo "::set-output name=value::$(the_last_hash)"
+          echo "::set-output name=value::$the_last_hash"
           if [ $the_last_hash != $(cat ./${{ env.HASH_STATE_FILE }}) ]; then 
             echo "::set-output name=changed::true"
           fi
@@ -84,6 +84,9 @@ jobs:
       - name: \[pre] V (symlink)
         run: sudo ./v symlink
         working-directory: ./v
+
+      - name: \[pre] V (print info)
+        run: v doctor
 
       - name: Checkout
         uses: actions/checkout@v2
