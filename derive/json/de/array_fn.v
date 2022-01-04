@@ -32,7 +32,7 @@ fn get_deser_array_expr(mut self Codegen, typ ast.Type, js_field_name string) as
 	}
 	// fn_name := get_decode_array_fn_name(type_arg, depth)
 	fn_name := get_decode_fn_name(type_arg)
-	elem_typ_sym := self.table.find_type(type_arg) or { panic(err) }
+	elem_typ_sym := self.table.find_sym(type_arg) or { panic(err) }
 	// dump(elem_typ_sym.idx)
 	// dump(ast.builtin_type_names.len)
 	// map_fn_arg_expr := if elem_typ_sym.idx < ast.builtin_type_names.len {
