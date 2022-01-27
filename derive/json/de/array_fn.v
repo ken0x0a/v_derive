@@ -17,6 +17,7 @@ fn get_array_depth_and_type_arg(type_name string) (int, string) {
 	}
 	return depth, temp
 }
+
 fn get_deser_array_expr_recursively(mut self Codegen, field ast.Expr, typ ast.Type) ast.Expr {
 	dump('')
 	panic('')
@@ -66,52 +67,61 @@ fn get_deser_array_expr(mut self Codegen, typ ast.Type, js_field_name string) as
 				// get_deser_array_expr_recursively(mut self, self.ident('it'), depth - 1)
 				ast.CallArg{
 					expr: self.ident('it')
-				}
+				},
 			]
-			or_block: ast.OrExpr{ kind: .propagate }
+			or_block: ast.OrExpr{
+				kind: .propagate
+			}
 			scope: self.scope()
 		})
 	}
 	// expr := get_deser_array_expr_recursively(mut self, self.ident('it'), depth)
-	return ast.Expr(
-		// ast.CallExpr{
-		// name: decode_json_array_fn_name
-		// args: [ast.CallArg{
-			ast.CallExpr{
-				name: 'map'
-				args: [ast.CallArg {
-					is_mut: false
-					share: .mut_t
-					expr: map_fn_arg_expr
-				}]
-				// left: field
-				scope: self.scope()
-				is_method: true
-
-				left: ast.CallExpr{
-					name: 'arr'
-					left: ast.IndexExpr{
-						index: self.string_literal(js_field_name)
-						left: self.ident(json2_map_name)
-						or_expr: ast.OrExpr{
-							kind: .block
-							// stmts: []
-							stmts: [ast.Stmt(ast.ExprStmt{expr:ast.ArrayInit{typ: self.find_type_or_add_placeholder('[]json2.Any', .v), elem_type: self.find_type_or_add_placeholder('json2.Any', .v)}})]
-						}
-					}
-					scope: self.scope()
-					is_method: true
+	// ast.CallExpr{
+	// name: decode_json_array_fn_name
+	// args: [ast.CallArg{
+	return ast.Expr(ast.CallExpr{
+		name: 'map'
+		args: [
+			ast.CallArg{
+				is_mut: false
+				share: .mut_t
+				expr: map_fn_arg_expr
+			},
+		]
+		// left: field
+		scope: self.scope()
+		is_method: true
+		left: ast.CallExpr{
+			name: 'arr'
+			left: ast.IndexExpr{
+				index: self.string_literal(js_field_name)
+				left: self.ident(json2_map_name)
+				or_expr: ast.OrExpr{
+					kind: .block
+					stmts: [
+						ast.Stmt(ast.ExprStmt{
+							expr: ast.ArrayInit{
+								typ: self.find_type_or_add_placeholder('[]json2.Any',
+									.v)
+								elem_type: self.find_type_or_add_placeholder('json2.Any',
+									.v)
+							}
+						}),
+					]
 				}
 			}
-		// 	}]
-		// 	concrete_types: [type_arg_idx]
-		// 	scope: self.scope()
-		// 	is_method: false // left: self.ident('j')
-		// 	or_block: ast.OrExpr{
-		// 		kind: .propagate
-		// 	}
-		// }
-	)
+			scope: self.scope()
+			is_method: true
+		}
+	})
+	// 	}]
+	// 	concrete_types: [type_arg_idx]
+	// 	scope: self.scope()
+	// 	is_method: false // left: self.ident('j')
+	// 	or_block: ast.OrExpr{
+	// 		kind: .propagate
+	// 	}
+	// }
 }
 
 // ```v
@@ -126,7 +136,8 @@ fn register_array_fn_if_not_exist(mut self Codegen, typ ast.Type, typ_arg string
 			// obj := j.as_map()
 			ast.Stmt(ast.AssignStmt{
 				left: [self.ident(json2_map_name)]
-				right: [ast.Expr(ast.CallExpr{
+				right: [
+					ast.Expr(ast.CallExpr{
 					name: 'as_map'
 					left: self.ident(json2_any_param_name)
 					scope: self.scope()
@@ -134,7 +145,7 @@ fn register_array_fn_if_not_exist(mut self Codegen, typ ast.Type, typ_arg string
 				})]
 				op: token.Kind.decl_assign // op: token.Kind.and // op: token.Kind.assign
 			}),
-			// 
+			//
 			ast.Stmt(ast.AssignStmt{
 				left: [self.ident_opt('res', is_mut: true)]
 				right: [ast.Expr(ast.MapInit{
@@ -189,8 +200,7 @@ fn register_array_fn_if_not_exist(mut self Codegen, typ ast.Type, typ_arg string
 					// op: token.Kind.assign
 					op: token.Kind.assign
 					// op: token.Kind.and
-				}),
-				]
+				})]
 			},
 			ast.Return{
 				exprs: [self.ident('res')]
@@ -203,10 +213,12 @@ fn register_array_fn_if_not_exist(mut self Codegen, typ ast.Type, typ_arg string
 			dump(self.find_type_or_add_placeholder('map[string]json2.Any', .v))
 			dump(typ)
 		}
-		params := [ast.Param{
-			name: json2_any_param_name
-			typ: self.find_type_or_add_placeholder('json2.Any', .v)
-		}]
+		params := [
+			ast.Param{
+				name: json2_any_param_name
+				typ: self.find_type_or_add_placeholder('json2.Any', .v)
+			},
+		]
 
 		// ## Register to table
 		fn_def := ast.Fn{

@@ -5,15 +5,15 @@ import codegen { Codegen }
 
 struct DeserJsonFn {
 mut:
-	gen Codegen [required]
+	gen           Codegen    [required]
 	prepend_stmts []ast.Stmt // ISSUE: 11563
 	// ↓↓↓ for debug ↓↓↓
 	stmt ast.StructDecl
 }
+
 fn (mut self DeserJsonFn) gen() {
 	stmt := self.stmt
 	mut body_stmts := get_decode_json_base_stmts(mut self.gen)
-	
 
 	// ISSUE: 11563
 	return_stmt := ast.Return{
@@ -35,11 +35,14 @@ fn (mut self DeserJsonFn) gen() {
 		body_stmts << pre_stmt
 	}
 	body_stmts << return_stmt
-	type_self := self.gen.find_type_or_add_placeholder(get_struct_name_without_module(stmt.name), .v)
-	mut params := [ast.Param{
-		name: 'j'
-		typ: self.gen.find_type_or_add_placeholder('json2.Any', .v)
-	}]
+	type_self := self.gen.find_type_or_add_placeholder(get_struct_name_without_module(stmt.name),
+		.v)
+	mut params := [
+		ast.Param{
+			name: 'j'
+			typ: self.gen.find_type_or_add_placeholder('json2.Any', .v)
+		},
+	]
 	self.gen.add_fn(
 		is_pub: true
 		name: get_decode_fn_name(stmt.name)
@@ -60,7 +63,10 @@ fn (mut self DeserJsonFn) gen() {
 // fn macro_decode_json__my_struct_name(j json2.Any) ?MyStructName { ... }
 // ```
 pub fn add_decode_json_fn(mut self Codegen, stmt ast.StructDecl) {
-	mut inst := DeserJsonFn{gen: self, stmt: stmt}
+	mut inst := DeserJsonFn{
+		gen: self
+		stmt: stmt
+	}
 	inst.gen()
 }
 
@@ -82,6 +88,7 @@ fn is_field_required(field &ast.StructField) bool {
 	}
 	return is_required
 }
+
 fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.Expr {
 	field_name := field.name
 	js_field_name := get_js_field_name(field)
@@ -103,7 +110,8 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 			// fn_name := '${get_decode_fn_name(stmt.name)}'
 			fn_name := get_decode_map_fn_name(type_arg, map_depth)
 			register_map_fn_if_not_exist(mut self, typ, type_arg, fn_name, map_depth)
-			inst.prepend_stmts << issue_11563__get_declaration_stmt_temp_var_for_map(mut self, fn_name, field_name, js_field_name, typ, map_depth)// ISSUE: 11563
+			inst.prepend_stmts << issue_11563__get_declaration_stmt_temp_var_for_map(mut self,
+				fn_name, field_name, js_field_name, typ, map_depth) // ISSUE: 11563
 			return self.ident(field_name) // ISSUE: 11563
 			// ISSUE: 11563
 			/*
@@ -194,16 +202,18 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 		// }
 		return ast.Expr(ast.CallExpr{
 			name: decode_fn_name
-			args: [ast.CallArg{
-				expr: ast.IndexExpr{
-					index: self.string_literal(js_field_name)
-					left: self.ident(json2_map_name)
-					or_expr: ast.OrExpr{
-						kind: .block
-						stmts: [codegen.string_literal_stmt('')]
+			args: [
+				ast.CallArg{
+					expr: ast.IndexExpr{
+						index: self.string_literal(js_field_name)
+						left: self.ident(json2_map_name)
+						or_expr: ast.OrExpr{
+							kind: .block
+							stmts: [codegen.string_literal_stmt('')]
+						}
 					}
-				}
-			}]
+				},
+			]
 			// concrete_types: concrete_types
 			scope: self.scope()
 			is_method: false // left: self.ident('j')
@@ -270,4 +280,4 @@ fn get_json2_map_index_or_expr(is_required bool, typ ast.Type) ast.OrExpr {
 			stmts: [default_value]
 		}
 	}
-} 
+}
