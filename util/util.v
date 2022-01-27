@@ -1,6 +1,7 @@
 module util
 
 import v.ast
+import term
 
 // https://github.com/vlang/v/blob/master/vlib/v/ast/types.v#L419
 pub fn str_to_type(typ string) ast.Type {
@@ -105,95 +106,95 @@ pub fn str_to_type(typ string) ast.Type {
 
 pub fn debug_stmt(stmt ast.Stmt) {
 	// println(stmt.type_name())
-	println(stmt)
-	// match stmt {
-	// 	ast.AsmStmt { println(stmt) }
-	// 	ast.AssertStmt { println(stmt) }
-	// 	ast.AssignStmt { println(stmt) }
-	// 	ast.Block { println(stmt) }
-	// 	ast.BranchStmt { println(stmt) }
-	// 	ast.CompFor { println(stmt) }
-	// 	ast.ConstDecl { println(stmt) }
-	// 	ast.DeferStmt { println(stmt) }
-	// 	ast.EmptyStmt { println(stmt) }
-	// 	ast.EnumDecl { println(stmt) }
-	// 	ast.ExprStmt { println(stmt) }
-	// 	ast.FnDecl { println(stmt) }
-	// 	ast.ForCStmt { println(stmt) }
-	// 	ast.ForInStmt { println(stmt) }
-	// 	ast.ForStmt { println(stmt) }
-	// 	ast.GlobalDecl { println(stmt) }
-	// 	ast.GotoLabel { println(stmt) }
-	// 	ast.GotoStmt { println(stmt) }
-	// 	ast.HashStmt { println(stmt) }
-	// 	ast.Import { println(stmt) }
-	// 	ast.InterfaceDecl { println(stmt) }
-	// 	ast.Module { println(stmt) }
-	// 	ast.NodeError { println(stmt) }
-	// 	ast.Return { println(stmt) }
-	// 	ast.SqlStmt { println(stmt) }
-	// 	ast.StructDecl { println(stmt) }
-	// 	ast.TypeDecl { println(stmt) }
-	// }
+	// println(stmt)
+	match stmt {
+		ast.AsmStmt { dump(stmt) }
+		ast.AssertStmt { dump(stmt) }
+		ast.AssignStmt { dump(stmt) }
+		ast.Block { dump(stmt) }
+		ast.BranchStmt { dump(stmt) }
+		ast.ComptimeFor { dump(stmt) }
+		ast.ConstDecl { dump(stmt) }
+		ast.DeferStmt { dump(stmt) }
+		ast.EmptyStmt { dump(stmt) }
+		ast.EnumDecl { dump(stmt) }
+		ast.ExprStmt { dump(stmt) }
+		ast.FnDecl { dump(stmt) }
+		ast.ForCStmt { dump(stmt) }
+		ast.ForInStmt { dump(stmt) }
+		ast.ForStmt { dump(stmt) }
+		ast.GlobalDecl { dump(stmt) }
+		ast.GotoLabel { dump(stmt) }
+		ast.GotoStmt { dump(stmt) }
+		ast.HashStmt { dump(stmt) }
+		ast.Import { dump(stmt) }
+		ast.InterfaceDecl { dump(stmt) }
+		ast.Module { dump(stmt) }
+		ast.NodeError { dump(stmt) }
+		ast.Return { dump(stmt) }
+		ast.SqlStmt { dump(stmt) }
+		ast.StructDecl { dump(stmt) }
+		ast.TypeDecl { dump(stmt) }
+	}
 }
 
 pub fn debug_expr(expr ast.Expr) {
-	println(expr)
-	// match expr {
-	// 	ast.AnonFn { println(expr) }
-	// 	ast.ArrayDecompose { println(expr) }
-	// 	ast.ArrayInit { println(expr) }
-	// 	ast.AsCast { println(expr) }
-	// 	ast.Assoc { println(expr) }
-	// 	ast.AtExpr { println(expr) }
-	// 	ast.BoolLiteral { println(expr) }
-	// 	ast.CTempVar { println(expr) }
-	// 	ast.CallExpr { println(expr) }
-	// 	ast.CastExpr { println(expr) }
-	// 	ast.ChanInit { println(expr) }
-	// 	ast.CharLiteral { println(expr) }
-	// 	ast.Comment { println(expr) }
-	// 	// ast.ComptimeCall { println(expr) }
-	// 	ast.ComptimeSelector { println(expr) }
-	// 	ast.ConcatExpr { println(expr) }
-	// 	ast.DumpExpr { println(expr) }
-	// 	ast.EmptyExpr { println(expr) }
-	// 	ast.EnumVal { println(expr) }
-	// 	ast.FloatLiteral { println(expr) }
-	// 	ast.GoExpr { println(expr) }
-	// 	ast.Ident { println(expr) }
-	// 	ast.IfExpr { println(expr) }
-	// 	ast.IfGuardExpr { println(expr) }
-	// 	ast.IndexExpr { println(expr) }
-	// 	ast.InfixExpr { println(expr) }
-	// 	ast.IntegerLiteral { println(expr) }
-	// 	ast.IsRefType { println(expr) }
-	// 	ast.Likely { println(expr) }
-	// 	ast.LockExpr { println(expr) }
-	// 	ast.MapInit { println(expr) }
-	// 	ast.MatchExpr { println(expr) }
-	// 	ast.NodeError { println(expr) }
-	// 	ast.None { println(expr) }
-	// 	ast.OffsetOf { println(expr) }
-	// 	ast.OrExpr { println(expr) }
-	// 	ast.ParExpr { println(expr) }
-	// 	ast.PostfixExpr { println(expr) }
-	// 	ast.PrefixExpr { println(expr) }
-	// 	ast.RangeExpr { println(expr) }
-	// 	ast.SelectExpr { println(expr) }
-	// 	ast.SelectorExpr { println(expr) }
-	// 	ast.SizeOf { println(expr) }
-	// 	ast.SqlExpr { println(expr) }
-	// 	ast.StringInterLiteral { println(expr) }
-	// 	ast.StringLiteral { println(expr) }
-	// 	ast.StructInit { println(expr) }
-	// 	ast.TypeNode { println(expr) }
-	// 	ast.TypeOf { println(expr) }
-	// 	ast.UnsafeExpr { println(expr) }
-	// 	else {
-	// 		eprint(term.red('unsupported type'))
-	// 		eprintln(expr.type_name())
-	// 		println(expr)
-	// 	}
-	// }
+	// println(expr)
+	match expr {
+		ast.AnonFn { dump(expr) }
+		ast.ArrayDecompose { dump(expr) }
+		ast.ArrayInit { dump(expr) }
+		ast.AsCast { dump(expr) }
+		ast.Assoc { dump(expr) }
+		ast.AtExpr { dump(expr) }
+		ast.BoolLiteral { dump(expr) }
+		ast.CTempVar { dump(expr) }
+		ast.CallExpr { dump(expr) }
+		ast.CastExpr { dump(expr) }
+		ast.ChanInit { dump(expr) }
+		ast.CharLiteral { dump(expr) }
+		ast.Comment { dump(expr) }
+		// ast.ComptimeCall { dump(expr) }
+		ast.ComptimeSelector { dump(expr) }
+		ast.ConcatExpr { dump(expr) }
+		ast.DumpExpr { dump(expr) }
+		ast.EmptyExpr { dump(expr) }
+		ast.EnumVal { dump(expr) }
+		ast.FloatLiteral { dump(expr) }
+		ast.GoExpr { dump(expr) }
+		ast.Ident { dump(expr) }
+		ast.IfExpr { dump(expr) }
+		ast.IfGuardExpr { dump(expr) }
+		ast.IndexExpr { dump(expr) }
+		ast.InfixExpr { dump(expr) }
+		ast.IntegerLiteral { dump(expr) }
+		ast.IsRefType { dump(expr) }
+		ast.Likely { dump(expr) }
+		ast.LockExpr { dump(expr) }
+		ast.MapInit { dump(expr) }
+		ast.MatchExpr { dump(expr) }
+		ast.NodeError { dump(expr) }
+		ast.None { dump(expr) }
+		ast.OffsetOf { dump(expr) }
+		ast.OrExpr { dump(expr) }
+		ast.ParExpr { dump(expr) }
+		ast.PostfixExpr { dump(expr) }
+		ast.PrefixExpr { dump(expr) }
+		ast.RangeExpr { dump(expr) }
+		ast.SelectExpr { dump(expr) }
+		ast.SelectorExpr { dump(expr) }
+		ast.SizeOf { dump(expr) }
+		ast.SqlExpr { dump(expr) }
+		ast.StringInterLiteral { dump(expr) }
+		ast.StringLiteral { dump(expr) }
+		ast.StructInit { dump(expr) }
+		ast.TypeNode { dump(expr) }
+		ast.TypeOf { dump(expr) }
+		ast.UnsafeExpr { dump(expr) }
+		else {
+			eprint(term.red('unsupported type'))
+			eprintln(expr.type_name())
+			println(expr)
+		}
+	}
 }
