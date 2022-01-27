@@ -23,7 +23,9 @@ fn issue_11563__get_declaration_stmt_temp_var_for_map(mut self Codegen, decode_f
 				ast.IfBranch {
 					scope: self.scope()
 					cond: ast.Expr(ast.IfGuardExpr{
-						var_name: issue_11563_if_guard_var_name
+						vars: [ast.IfGuardVar{
+							name: issue_11563_if_guard_var_name
+						}]
 						expr: ast.IndexExpr{
 							index: self.string_literal(js_field_name)
 							// left: self.ident(decode_json_fn_arg_name)
