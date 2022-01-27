@@ -27,6 +27,7 @@ fn get_decode_map_fn_name(struct_name string, depth int) string {
 	res += '_${to_snake_case(name)}'
 	return res
 }
+
 // Generates something like:
 //	 macro_deser_json__arr__my_struct_type()
 //	 macro_deser_json__arr_arr__my_struct_type()
