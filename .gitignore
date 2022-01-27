@@ -9,3 +9,5 @@ main
 
 generated_by_derive.v
 _docs
+
+bin/derive/derive
