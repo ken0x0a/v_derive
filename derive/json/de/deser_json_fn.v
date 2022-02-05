@@ -6,7 +6,6 @@ import codegen { Codegen }
 struct DeserJsonFn {
 mut:
 	gen           Codegen    [required]
-	prepend_stmts []ast.Stmt // ISSUE: 11563
 	// ↓↓↓ for debug ↓↓↓
 	stmt ast.StructDecl
 }
@@ -15,7 +14,6 @@ fn (mut self DeserJsonFn) gen() {
 	stmt := self.stmt
 	mut body_stmts := get_decode_json_base_stmts(mut self.gen)
 
-	// ISSUE: 11563
 	return_stmt := ast.Return{
 		exprs: [
 			ast.Expr(ast.StructInit{
@@ -30,9 +28,6 @@ fn (mut self DeserJsonFn) gen() {
 				// ]
 			}),
 		]
-	}
-	for pre_stmt in self.prepend_stmts {
-		body_stmts << pre_stmt
 	}
 	body_stmts << return_stmt
 	type_self := self.gen.find_type_or_add_placeholder(get_struct_name_without_module(stmt.name),
@@ -70,7 +65,6 @@ pub fn add_decode_json_fn(mut self Codegen, stmt ast.StructDecl) {
 	inst.gen()
 }
 
-// ISSUE: 11563
 fn (mut inst DeserJsonFn) gen_struct_init_field(field ast.StructField) ast.StructInitField {
 	return ast.StructInitField{
 		name: field.name
@@ -90,7 +84,6 @@ fn is_field_required(field &ast.StructField) bool {
 }
 
 fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.Expr {
-	field_name := field.name
 	js_field_name := get_js_field_name(field)
 	typ := field.typ // BUG? `u8` is not parsed properly => `def.u8`
 	// if self.table.sym(typ).name.split('.').last() == 'u8' { panic("Don't use `u8` as it doesn't parsed properly") }
@@ -110,28 +103,31 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 			// fn_name := '${get_decode_fn_name(stmt.name)}'
 			fn_name := get_decode_map_fn_name(type_arg, map_depth)
 			register_map_fn_if_not_exist(mut self, typ, type_arg, fn_name, map_depth)
-			inst.prepend_stmts << issue_11563__get_declaration_stmt_temp_var_for_map(mut self,
-				fn_name, field_name, js_field_name, typ, map_depth) // ISSUE: 11563
-			return self.ident(field_name) // ISSUE: 11563
-			// ISSUE: 11563
-			/*
 			return ast.Expr(ast.CallExpr{
 				name: fn_name
-				args: [ast.CallArg{
-					expr: ast.CallExpr{
-						name: 'as_map'
-						left: ast.IndexExpr{
-							index: self.string_literal(js_field_name)
-							left: self.ident(json2_map_name)
-							or_expr: ast.OrExpr{
-								kind: .block
-								stmts: [codegen.string_literal_stmt('')]
-							} // ast.CastExpr('json2.Any')
+				args: [
+					ast.CallArg{
+						expr: ast.CallExpr{
+							name: 'as_map'
+							left: ast.IndexExpr{
+								index: self.string_literal(js_field_name)
+								left: self.ident(json2_map_name)
+								or_expr: ast.OrExpr{
+									kind: .block
+									stmts: [
+										ast.Stmt(ast.ExprStmt{
+											expr: ast.MapInit{
+												typ: typ
+											}
+										}),
+									]
+								} // ast.CastExpr('json2.Any')
+							}
+							scope: self.scope()
+							is_method: true
 						}
-						scope: self.scope()
-						is_method: true
-					}
-				}]
+					},
+				]
 				// concrete_types: [type_arg_idx]
 				scope: self.scope()
 				is_method: false // left: self.ident('j')
@@ -139,7 +135,6 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 					kind: .propagate
 				}
 			})
-			*/
 		} else if type_sym.name.starts_with('[') {
 			// array
 			// type_arg := type_sym.name.split_nth(']', 2)[1]
