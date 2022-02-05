@@ -6,10 +6,11 @@ import term
 import codegen { Codegen }
 
 pub const (
-	macro_name = 'SerJson'
-	attr_json2_as = 'ser_json_as'
+	macro_name           = 'SerJson'
+	attr_json2_as        = 'ser_json_as'
 	attr_skip_if_default = 'ser_json_skip_if_default'
 )
+
 const (
 	json2_map_name            = 'obj'
 	json2_any_param_name      = 'j'
@@ -35,18 +36,16 @@ pub fn add_encode_json(mut self Codegen, stmt ast.StructDecl) {
 	for field in stmt.fields {
 		body_stmts << set_value_stmt_or_skip(mut self, field)
 	}
-	body_stmts << ast.Stmt(
-		ast.Return{
-			exprs: [ast.Expr(
-				ast.CallExpr{
-					name: 'str'
-					left: self.ident(json2_map_name)
-					scope: self.scope()
-					is_method: true
-				}
-			)]
-		}
-	)
+	body_stmts << ast.Stmt(ast.Return{
+		exprs: [
+			ast.Expr(ast.CallExpr{
+				name: 'str'
+				left: self.ident(json2_map_name)
+				scope: self.scope()
+				is_method: true
+			}),
+		]
+	})
 	self.add_struct_method(
 		struct_name: stmt.name.split('.').last()
 		is_mut: false
@@ -70,9 +69,8 @@ fn get_encode_json_base_stmts(mut self Codegen) []ast.Stmt {
 			left: [self.ident_opt(ser.json2_map_name, is_mut: true)]
 			right: [
 				ast.Expr(ast.MapInit{
-					typ: self.find_type_or_add_placeholder('map[string]json2.Any', .v)
-				})
-			]
+				typ: self.find_type_or_add_placeholder('map[string]json2.Any', .v)
+			})]
 			op: token.Kind.decl_assign
 		}),
 	]
@@ -175,10 +173,12 @@ fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 	right := get_type_recursively(mut self, field, field_sel, typ)
 
 	assign_stmt := ast.AssignStmt{
-		left: [ast.Expr(ast.IndexExpr{
-			index: self.string_literal(js_field_name)
-			left: self.ident(ser.json2_map_name)
-		})]
+		left: [
+			ast.Expr(ast.IndexExpr{
+				index: self.string_literal(js_field_name)
+				left: self.ident(ser.json2_map_name)
+			}),
+		]
 		right: [right]
 		op: token.Kind.assign
 	}
@@ -191,20 +191,18 @@ fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 	} else {
 		field.default_expr
 	}
-	if_expr := ast.IfExpr {
+	if_expr := ast.IfExpr{
 		branches: [
-			ast.IfBranch {
+			ast.IfBranch{
 				scope: self.scope()
 				// if status == 0 {
-				cond: ast.Expr(
-					ast.InfixExpr{
-						op: token.Kind.ne
-						left: field_sel
-						right: default_expr
-					}
-				)
+				cond: ast.Expr(ast.InfixExpr{
+					op: token.Kind.ne
+					left: field_sel
+					right: default_expr
+				})
 				stmts: [ast.Stmt(assign_stmt)]
-			}
+			},
 		]
 		is_expr: false
 		has_else: false
@@ -213,6 +211,7 @@ fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 		expr: if_expr
 	}
 }
+
 fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.Expr, typ ast.Type) ast.Expr {
 	// fallback to parent type, if type has no `str` method
 	mut type_sym := self.table.sym(typ)
@@ -274,7 +273,7 @@ fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.E
 		})
 	} else if type_sym.is_builtin() {
 		ser_as := get_ser_as(field.attrs)
-		
+
 		match typ {
 			ast.f64_type, ast.f32_type {
 				if ser_as == 'str' {
@@ -282,7 +281,9 @@ fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.E
 						scope: self.scope()
 						is_method: true
 						name: 'trim_right'
-						args: [ast.CallArg{expr: codegen.string_literal('.')}]
+						args: [ast.CallArg{
+							expr: codegen.string_literal('.')
+						}]
 						left: ast.CallExpr{
 							scope: self.scope()
 							is_method: true
@@ -294,8 +295,8 @@ fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.E
 					field_sel
 				}
 			}
-			ast.i8_type, ast.int_type, ast.i16_type, ast.i64_type, ast.isize_type,
-				ast.byte_type, ast.u8_type, ast.u16_type, ast.u32_type, ast.u64_type, ast.usize_type {
+			ast.i8_type, ast.int_type, ast.i16_type, ast.i64_type, ast.isize_type, ast.byte_type,
+			ast.u8_type, ast.u16_type, ast.u32_type, ast.u64_type, ast.usize_type {
 				if ser_as == 'str' {
 					ast.Expr(ast.CallExpr{
 						scope: self.scope()
@@ -324,7 +325,7 @@ fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.E
 				// }
 
 				// elem_type_sym := self.table.sym(type_sym.info.elem_type)
-				
+
 				// match elem_type_sym.info {
 
 				// }
@@ -333,14 +334,17 @@ fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.E
 					typ: j2any
 					expr: ast.CallExpr{
 						name: 'map'
-						args: [ast.CallArg {
-							is_mut: false
-							share: .mut_t
-							expr: ast.CastExpr{
-								typ: j2any
-								expr: get_type_recursively(mut self, field, self.ident('it'), info.elem_type)
-							}
-						}]
+						args: [
+							ast.CallArg{
+								is_mut: false
+								share: .mut_t
+								expr: ast.CastExpr{
+									typ: j2any
+									expr: get_type_recursively(mut self, field, self.ident('it'),
+										info.elem_type)
+								}
+							},
+						]
 						left: field_sel
 						scope: self.scope()
 						is_method: true
@@ -370,7 +374,6 @@ fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.E
 	}
 	return right
 }
-
 
 fn get_js_field_name(field ast.StructField) string {
 	mut name := field.name

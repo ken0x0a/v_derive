@@ -16,7 +16,8 @@ pub fn (mut p Codegen) find_type_or_add_placeholder(name string, language ast.La
 		}
 		if name.starts_with('map[') {
 			parts := name[4..].split_nth(']', 2)
-			map_type_idx := p.table.find_or_register_map(p.find_type_or_add_placeholder(parts[0], .v), p.find_type_or_add_placeholder(parts[1], .v))
+			map_type_idx := p.table.find_or_register_map(p.find_type_or_add_placeholder(parts[0],
+				.v), p.find_type_or_add_placeholder(parts[1], .v))
 			$if debug_codegen ? {
 				dump(map_type_idx)
 			}

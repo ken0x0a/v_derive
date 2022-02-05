@@ -30,22 +30,35 @@ mut:
 // }
 // ```
 pub fn add_encode_json_enum(mut self Codegen, stmt ast.EnumDecl) {
-	mut gen := SerJsonEnum{gen: self, stmt: stmt}
+	mut gen := SerJsonEnum{
+		gen: self
+		stmt: stmt
+	}
 	gen.add_impl()
 }
 
 fn (mut self SerJsonEnum) get_enum_value_expr(field ast.EnumField, rename_to EnumRename) ast.Expr {
 	return match rename_to {
-		.snake_case { self.gen.string_literal(field.name) }
-		.upper_case { self.gen.string_literal(field.name.to_upper()) }
-		.pascal_case { self.gen.string_literal(field.name.split('_').map('${it[0..1].to_upper()}${it[1..]}').join('')) }
+		.snake_case {
+			self.gen.string_literal(field.name)
+		}
+		.upper_case {
+			self.gen.string_literal(field.name.to_upper())
+		}
+		.pascal_case {
+			self.gen.string_literal(field.name.split('_').map('${it[0..1].to_upper()}${it[1..]}').join(''))
+		}
 		.camel_case {
 			parts := field.name.split('_')
 			p2 := parts[1..].map('${it[0..1].to_upper()}${it[1..]}')
-			self.gen.string_literal('${parts[0]}${p2}')
+			self.gen.string_literal('${parts[0]}$p2')
 		}
-		.kebab_case { self.gen.string_literal(field.name.replace('_', '-')) }
-		.screaming_kebab_case { self.gen.string_literal(field.name.replace('_', '-').to_upper()) }
+		.kebab_case {
+			self.gen.string_literal(field.name.replace('_', '-'))
+		}
+		.screaming_kebab_case {
+			self.gen.string_literal(field.name.replace('_', '-').to_upper())
+		}
 		.repr {
 			dump(field)
 			panic('Not Implemented yet for $rename_to')
@@ -61,10 +74,14 @@ fn (mut self SerJsonEnum) add_impl() {
 	for field in self.stmt.fields {
 		branches << ast.MatchBranch{
 			scope: self.gen.scope()
-			exprs: [ast.Expr(ast.EnumVal{val: field.name})]
-			stmts: [ast.Stmt(ast.ExprStmt{
-				expr: self.get_enum_value_expr(field, rename_to)
+			exprs: [ast.Expr(ast.EnumVal{
+				val: field.name
 			})]
+			stmts: [
+				ast.Stmt(ast.ExprStmt{
+					expr: self.get_enum_value_expr(field, rename_to)
+				}),
+			]
 		}
 	}
 	// branches << ast.MatchBranch{
@@ -72,22 +89,20 @@ fn (mut self SerJsonEnum) add_impl() {
 	// 	exprs: []
 	// 	is_else: true
 	// }
-	body_stmts << ast.Stmt(
-		ast.Return{
-			exprs: [ast.Expr(
-				ast.MatchExpr{
-					is_expr: true
-					return_type: ast.string_type
-					cond: self.gen.ident('self')
-					branches: branches
-				}
-			)]
-		}
-	)
+	body_stmts << ast.Stmt(ast.Return{
+		exprs: [
+			ast.Expr(ast.MatchExpr{
+				is_expr: true
+				return_type: ast.string_type
+				cond: self.gen.ident('self')
+				branches: branches
+			}),
+		]
+	})
 	self.gen.add_struct_method(
 		struct_name: self.stmt.name.split('.').last()
 		is_mut: false
-		name: ser.encode_json_member_name
+		name: encode_json_member_name
 		return_type: ast.string_type
 		body_stmts: body_stmts
 		params: []
@@ -104,13 +119,27 @@ fn (self SerJsonEnum) get_rename_method() EnumRename {
 	for attr in self.stmt.attrs {
 		if attr.name == 'serde_rename' {
 			return match attr.arg {
-				'snake_case', 'snake' { EnumRename.snake_case }
-				'UPPER_CASE', 'UPPER' { EnumRename.upper_case }
-				'PascalCase' { EnumRename.pascal_case }
-				'camelCase' { EnumRename.camel_case }
-				'kebab-case' { EnumRename.kebab_case }
-				'SCREAMING-KEBAB-CASE' { EnumRename.screaming_kebab_case }
-				'repr' { EnumRename.repr }
+				'snake_case', 'snake' {
+					EnumRename.snake_case
+				}
+				'UPPER_CASE', 'UPPER' {
+					EnumRename.upper_case
+				}
+				'PascalCase' {
+					EnumRename.pascal_case
+				}
+				'camelCase' {
+					EnumRename.camel_case
+				}
+				'kebab-case' {
+					EnumRename.kebab_case
+				}
+				'SCREAMING-KEBAB-CASE' {
+					EnumRename.screaming_kebab_case
+				}
+				'repr' {
+					EnumRename.repr
+				}
 				else {
 					eprintln(term.red('Unexpected serde_rename attr: $attr.arg'))
 					eprint('Must be one of: ')

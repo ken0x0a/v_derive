@@ -5,8 +5,8 @@ import v.pref
 import v.parser
 import os
 import term
-import codegen {Codegen}
-import macro {Macro, Derive}
+import codegen { Codegen }
+import macro { Derive, Macro }
 import derive.json.de as deser_json
 
 fn main() {
@@ -17,11 +17,7 @@ fn main() {
 		exit(1)
 	}
 	mut filename := os.args[1]
-	output_file := if os.args.len > 2 {
-		os.args[2]
-	} else {
-		'generated_by_derive.v'
-	}
+	output_file := if os.args.len > 2 { os.args[2] } else { 'generated_by_derive.v' }
 	mut files := []string{}
 	outdir := if os.is_dir(filename) {
 		dirname := filename
@@ -81,18 +77,20 @@ fn derive_code_for_stmts(mut gen Codegen, parsed ast.File) {
 				gen_code(mut gen, macro, GenCodeDecl(stmt as ast.EnumDecl))
 			}
 		}
-
 	}
 }
 
 interface HasAttrs {
 	attrs []ast.Attr
 }
+
 fn get_macros(stmt HasAttrs) []Macro {
 	mut macros := []Macro{}
 	for attr in stmt.attrs {
 		if attr.name == 'derive' {
-			macros << Macro(Derive{names: attr.arg.split(',').map(it.trim_space())})
+			macros << Macro(Derive{
+				names: attr.arg.split(',').map(it.trim_space())
+			})
 		}
 	}
 	return macros

@@ -7,7 +7,7 @@ import v.pref
 import v.token
 import v.parser
 import term
-import util {debug_stmt, str_from_type}
+import util { debug_stmt, str_from_type }
 
 [inline]
 pub fn is_comment(stmt ast.Stmt) bool {
@@ -82,7 +82,7 @@ fn handle_response<T>(resp http.Response) ?T {
 			// println(table.bitsize_to_type(stmt.receiver.typ))
 			// println(stmt.receiver.default_expr)
 			for fn_stmt in stmt.stmts {
-				util.debug_stmt(fn_stmt)
+				debug_stmt(fn_stmt)
 				if fn_stmt is ast.ExprStmt {
 					util.debug_expr(fn_stmt.expr)
 				}
@@ -145,4 +145,3 @@ fn handle_response<T>(resp http.Response) ?T {
 	// 	}
 	// }
 }
-

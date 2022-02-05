@@ -4,14 +4,15 @@ import v.ast
 import v.token
 import term
 import codegen { Codegen }
-import derive.json.ser { ser_json_should_skip, ser_json_get_default_expr }
+import derive.json.ser { ser_json_get_default_expr, ser_json_should_skip }
 
 pub const (
 	name_as_http_params    = 'AsHttpParams'
 	fn_name_as_http_params = 'as_http_params'
 )
+
 const (
-	json2_map_name         = 'obj'
+	json2_map_name = 'obj'
 )
 
 // generates
@@ -31,7 +32,7 @@ pub fn add_as_http_params_fn_for_struct(mut self Codegen, stmt ast.StructDecl) {
 		right: [
 			ast.Expr(ast.MapInit{
 				typ: return_type
-			})
+			}),
 		]
 		op: token.Kind.decl_assign
 	})
@@ -73,7 +74,6 @@ fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 		mut type_sym := self.table.sym(typ)
 		print(field_name)
 		dump(type_sym.name)
-
 		ast.Expr(ast.CallExpr{
 			name: 'str'
 			left: field_sel_expr
@@ -96,7 +96,9 @@ fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 				}
 				true // ISSUE: 9419
 			}
-			else {true} // ISSUE: 9419
+			else {
+				true
+			} // ISSUE: 9419
 		}
 		// if info is ast.Alias {
 		// 	type_sym = self.table.sym(info.parent_type)
@@ -116,17 +118,21 @@ fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 				// field_sel_expr.map(it.str()).join('')
 				ast.Expr(ast.CallExpr{
 					name: 'join'
-					args: [ast.CallArg{ expr: self.string_literal('') }]
+					args: [ast.CallArg{
+						expr: self.string_literal('')
+					}]
 					left: ast.CallExpr{
 						name: 'map'
-						args: [ast.CallArg {
-							expr: ast.CallExpr{
-								name: 'str'
-								left: self.ident('it')
-								scope: self.scope()
-								is_method: true
-							}
-						}]
+						args: [
+							ast.CallArg{
+								expr: ast.CallExpr{
+									name: 'str'
+									left: self.ident('it')
+									scope: self.scope()
+									is_method: true
+								}
+							},
+						]
 						left: field_sel_expr
 						scope: self.scope()
 						is_method: true
@@ -157,10 +163,12 @@ fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 		}
 	}
 	assign_stmt := ast.AssignStmt{
-		left: [ast.Expr(ast.IndexExpr{
-			index: self.string_literal(js_field_name)
-			left: self.ident(json2_map_name)
-		})]
+		left: [
+			ast.Expr(ast.IndexExpr{
+				index: self.string_literal(js_field_name)
+				left: self.ident(json2_map_name)
+			}),
+		]
 		right: [right]
 		op: token.Kind.assign
 	}
@@ -173,20 +181,18 @@ fn set_value_stmt_or_skip(mut self Codegen, field ast.StructField) ast.Stmt {
 	} else {
 		field.default_expr
 	}
-	if_expr := ast.IfExpr {
+	if_expr := ast.IfExpr{
 		branches: [
-			ast.IfBranch {
+			ast.IfBranch{
 				scope: self.scope()
 				// if status == 0 {
-				cond: ast.Expr(
-					ast.InfixExpr{
-						op: token.Kind.ne
-						left: field_sel_expr
-						right: default_expr
-					}
-				)
+				cond: ast.Expr(ast.InfixExpr{
+					op: token.Kind.ne
+					left: field_sel_expr
+					right: default_expr
+				})
 				stmts: [ast.Stmt(assign_stmt)]
-			}
+			},
 		]
 		is_expr: false
 		has_else: false

@@ -5,14 +5,14 @@ import v.ast
 import v.fmt
 import v.pref
 // import v.token
-import util {str_to_type}
+import util
 
 pub struct Codegen {
 	mod string
 mut:
 	const_decl &ast.ConstDecl = voidptr(0)
-	no_main bool
-	scope   &ast.Scope     = &ast.Scope{ parent: 0 }
+	no_main    bool
+	scope      &ast.Scope = &ast.Scope{ parent: 0 }
 pub mut:
 	file  &ast.File
 	table &ast.Table
@@ -24,36 +24,43 @@ pub fn (mut self Codegen) scope_into_child() {
 	}
 	self.scope = scope
 }
+
 pub fn (mut self Codegen) scope_into_parent() {
 	self.scope = self.scope.parent
 }
+
 pub fn (self Codegen) scope() &ast.Scope {
 	return self.scope
 }
+
 pub fn (self Codegen) to_code_string() string {
 	return fmt.fmt(self.file, self.table, &pref.Preferences{}, false)
 }
+
 pub struct NewPlainArgs {
 	mod_name string = 'main'
 }
+
 pub struct NewWithAllArgs {
 	mod_name string
 	scope    &ast.Scope = &ast.Scope{ parent: 0 }
 	file     &ast.File
 	table    &ast.Table
 }
+
 pub struct NewWithTableArgs {
 	mod_name string
-	table        &ast.Table
+	table    &ast.Table
 }
-pub fn new_plain(args NewPlainArgs) Codegen {
 
+pub fn new_plain(args NewPlainArgs) Codegen {
 	mut table := ast.new_table()
 	return new_with_table(NewWithTableArgs{
-		...args,
+		...args
 		table: table
 	})
 }
+
 [inline]
 pub fn new_with_table(args NewWithTableArgs) Codegen {
 	scope := &ast.Scope{
@@ -68,9 +75,14 @@ pub fn new_with_table(args NewWithTableArgs) Codegen {
 			is_skipped: false
 		}
 	}
-	return new_with_all(NewWithAllArgs{...args, table: args.table, file: file, scope: scope
-})
+	return new_with_all(NewWithAllArgs{
+		...args
+		table: args.table
+		file: file
+		scope: scope
+	})
 }
+
 [inline]
 pub fn new_with_all(args NewWithAllArgs) Codegen {
 	mut gen := Codegen{
@@ -92,6 +104,7 @@ pub fn (mut self Codegen) add_file_comments(texts ...string) {
 		self.file.stmts.prepend(self.gen_comment_stmt(text: text))
 	}
 }
+
 pub fn (self Codegen) has_import(name string) bool {
 	for imp in self.file.imports {
 		if imp.mod == name {
@@ -100,25 +113,30 @@ pub fn (self Codegen) has_import(name string) bool {
 	}
 	return false
 }
+
 pub fn (mut self Codegen) add_import_if_not_exist(name string) {
 	if !self.has_import(name) {
 		self.file.imports << self.gen_import(name)
 	}
 }
+
 pub fn (mut self Codegen) add_import(name string) {
 	self.file.imports << self.gen_import(name)
 }
+
 pub struct ImportOpt {
 	symbols []string
-	name string
+	name    string
 }
+
 pub fn (mut self Codegen) add_import_opt(opt ImportOpt) {
 	self.file.imports << ast.Import{
 		mod: opt.name
 		alias: opt.name.split('.').last()
-		syms: opt.symbols.map(ast.ImportSymbol{name: it})
+		syms: opt.symbols.map(ast.ImportSymbol{ name: it })
 	}
 }
+
 pub fn (self Codegen) gen_import(name string) ast.Import {
 	return ast.Import{
 		mod: name
@@ -128,17 +146,29 @@ pub fn (self Codegen) gen_import(name string) ast.Import {
 
 // for `or_expr`
 pub fn (mut self Codegen) integer_literal_stmt(val int) ast.Stmt {
-	return ast.ExprStmt{expr: ast.IntegerLiteral{val: val.str()}}
+	return ast.ExprStmt{
+		expr: ast.IntegerLiteral{
+			val: val.str()
+		}
+	}
 }
+
 pub fn (mut self Codegen) integer_literal(val int) ast.Expr {
-	return ast.IntegerLiteral{val: val.str()}
+	return ast.IntegerLiteral{
+		val: val.str()
+	}
 }
+
 pub fn (mut self Codegen) string_literal(str string) ast.Expr {
-	return ast.StringLiteral{val: str}
+	return ast.StringLiteral{
+		val: str
+	}
 }
+
 pub struct IdentOpt {
 	is_mut bool
 }
+
 pub fn (mut self Codegen) ident_opt(name string, opt IdentOpt) ast.Expr {
 	if opt.is_mut {
 		return ast.Ident{
@@ -155,6 +185,7 @@ pub fn (mut self Codegen) ident_opt(name string, opt IdentOpt) ast.Expr {
 		return self.ident(name)
 	}
 }
+
 pub fn (mut self Codegen) ident(name string) ast.Expr {
 	return ast.Ident{
 		name: name
@@ -165,7 +196,9 @@ pub fn (mut self Codegen) ident(name string) ast.Expr {
 
 [inline]
 pub fn (mut self Codegen) gen_blank_stmt() ast.Stmt {
-	return ast.Stmt(ast.ExprStmt{expr: ast.empty_expr()})
+	return ast.Stmt(ast.ExprStmt{
+		expr: ast.empty_expr()
+	})
 }
 
 pub fn (mut self Codegen) add_struct_decl(opt ast.StructDecl) {
@@ -188,18 +221,19 @@ pub fn (mut self Codegen) gen_struct(opt ast.Struct) ast.Struct {
 // }
 // util.str_to_type('string')
 pub struct GenStructFieldOpt {
-	name    string [required]
+	name    string   [required]
 	typ     ast.Type [required]
 	comment string
 	// default_value
 	def_val string
 	is_mut  bool
-	attrs []ast.Attr
+	attrs   []ast.Attr
 }
 
 pub fn (mut self Codegen) add_stmt(stmt ast.Stmt) {
 	self.file.stmts << stmt
 }
+
 pub fn (mut self Codegen) gen_struct_field(opt GenStructFieldOpt) ast.StructField {
 	return ast.StructField{
 		name: opt.name
@@ -214,8 +248,8 @@ pub fn (mut self Codegen) gen_struct_field(opt GenStructFieldOpt) ast.StructFiel
 }
 
 pub struct GenCommentOpt {
-	text string
-	is_multi bool
+	text      string
+	is_multi  bool
 	is_inline bool
 }
 
@@ -236,7 +270,7 @@ pub fn (mut self Codegen) add_expr_stmt(expr ast.Expr) {
 
 // \u0001
 pub fn (mut self Codegen) add_comment_stmt(opt GenCommentOpt) {
-		self.file.stmts << self.gen_comment_stmt(opt)
+	self.file.stmts << self.gen_comment_stmt(opt)
 }
 
 // \u0001
@@ -252,13 +286,13 @@ pub fn (mut self Codegen) gen_comment_stmt(opt GenCommentOpt) ast.Stmt {
 }
 
 pub struct GenFnDeclOpt {
-	name string [required]
+	name        string        [required]
 	return_type ast.Type = ast.void_type
-	body_stmts []ast.Stmt [required]
-	comments []ast.Comment [required]
-	params []ast.Param [required]
-	attrs []ast.Attr
-	is_pub bool
+	body_stmts  []ast.Stmt    [required]
+	comments    []ast.Comment [required]
+	params      []ast.Param   [required]
+	attrs       []ast.Attr
+	is_pub      bool
 }
 
 pub fn (mut self Codegen) add_fn(opt GenFnDeclOpt) {
@@ -282,16 +316,16 @@ pub fn (mut self Codegen) gen_fn(opt GenFnDeclOpt) ast.Stmt {
 }
 
 pub struct GenStructMethodOpt {
-	name string [required]
-	return_type ast.Type = ast.void_type
-	body_stmts []ast.Stmt [required]
-	comments []ast.Comment [required]
-	params []ast.Param [required]
-	struct_name string [required]
+	name          string        [required]
+	return_type   ast.Type = ast.void_type
+	body_stmts    []ast.Stmt    [required]
+	comments      []ast.Comment [required]
+	params        []ast.Param   [required]
+	struct_name   string        [required]
 	receiver_name string = 'self'
 	receiver_type ast.Type
-	is_pub bool = true
-	is_mut bool // => rec_mut is_self_mut
+	is_pub        bool = true
+	is_mut        bool // => rec_mut is_self_mut
 }
 
 pub fn (mut self Codegen) add_struct_method(opt GenStructMethodOpt) {
@@ -321,13 +355,13 @@ pub fn (mut self Codegen) add_struct_method(opt GenStructMethodOpt) {
 	}
 
 	mut params := opt.params[..]
-	params.prepend( ast.Param {
+	params.prepend(ast.Param{
 		name: opt.receiver_name
 		typ: typ
 		is_mut: opt.is_mut
 	})
 
-	// method_idx := 
+	// method_idx :=
 	type_sym.register_method(ast.Fn{
 		name: opt.name
 		file_mode: .v
@@ -353,8 +387,13 @@ pub fn (mut self Codegen) add_struct_method(opt GenStructMethodOpt) {
 	for comment in opt.comments {
 		self.add_expr_stmt(comment)
 	}
-	self.file.stmts << self.gen_struct_method(GenStructMethodOpt{...opt, params: params, receiver_type: typ})
+	self.file.stmts << self.gen_struct_method(GenStructMethodOpt{
+		...opt
+		params: params
+		receiver_type: typ
+	})
 }
+
 fn (mut self Codegen) gen_struct_method(opt GenStructMethodOpt) ast.Stmt {
 	return ast.FnDecl{
 		return_type: opt.return_type
