@@ -45,11 +45,13 @@ pub fn (mut self Codegen) gen_fn_example(name string) ast.Stmt {
 		name: name
 		return_type: ast.string_type
 		body_stmts: body_stmts
-		comments: [ast.Comment{
-			text: '\u0001 this is my comment\n'
-			is_multi: true
-			is_inline: true
-		}]
+		comments: [
+			ast.Comment{
+				text: '\u0001 this is my comment\n'
+				is_multi: true
+				is_inline: true
+			},
+		]
 		params: []
 	)
 }

@@ -7,7 +7,7 @@ import v.pref
 import v.token
 
 fn test_gen_fn() {
-  answer := "fn yey() string {
+	answer := "fn yey() string {
 	a := r'example'
 	bool_op := (1) && (1.1)
 }

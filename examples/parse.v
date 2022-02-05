@@ -11,7 +11,7 @@ import term
 import os
 import json
 import macro
-import util {debug_stmt, str_from_type}
+import util { debug_stmt }
 
 [inline]
 pub fn is_comment(stmt ast.Stmt) bool {
@@ -77,4 +77,3 @@ pub struct MyStruct {
 		}
 	}
 }
-

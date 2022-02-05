@@ -1,19 +1,19 @@
 module main
 
-import v.ast { FnDecl, StructDecl, EnumDecl }
+import v.ast { EnumDecl, FnDecl, StructDecl }
 import term
-import macro { Macro, Derive, Custom }
+import macro { Custom, Derive, Macro }
 import derive.json.de as deser_json
 import derive.as_map
 import derive.json.ser as ser_json
 import derive.clone as derive_clone
-import codegen {Codegen}
+import codegen { Codegen }
 
-pub type GenCodeDecl = FnDecl | StructDecl | EnumDecl
+pub type GenCodeDecl = EnumDecl | FnDecl | StructDecl
 
 pub fn gen_code(mut gen Codegen, macro Macro, decl GenCodeDecl) {
 	match decl {
-		ast.StructDecl {
+		StructDecl {
 			match macro {
 				Custom {
 					eprintln(term.red('Custom macro $macro is not supported for Struct'))
@@ -25,12 +25,12 @@ pub fn gen_code(mut gen Codegen, macro Macro, decl GenCodeDecl) {
 				}
 			}
 		}
-		ast.FnDecl {
+		FnDecl {
 			if macro !is Custom {
 				panic('Only Custom macro is supported for FnDecl')
 			}
 		}
-		ast.EnumDecl {
+		EnumDecl {
 			match macro {
 				Custom {
 					eprintln(term.red('Custom macro $macro is not supported for Enum'))
@@ -60,6 +60,7 @@ pub fn gen_derive_for_enum(mut gen Codegen, macro_name string, decl EnumDecl) {
 		}
 	}
 }
+
 pub fn gen_derive_for_struct(mut gen Codegen, macro_name string, decl StructDecl) {
 	match macro_name {
 		derive_clone.macro_name {

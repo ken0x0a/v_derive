@@ -34,7 +34,7 @@ pub fn parse_from_text(text string) Macro {
 	mut attrs := map[string]string{}
 	if input.contains('(') {
 		assert input.ends_with(')') // 'Invalid macro syntax. missing `)`'
-		parts := input[0..input.len -1].split('(')
+		parts := input[0..input.len - 1].split('(')
 		name = parts[0]
 
 		match name {

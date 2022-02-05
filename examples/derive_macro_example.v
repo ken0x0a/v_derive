@@ -9,14 +9,14 @@ import v.parser
 import os
 import json
 import term
-import util {str_to_type}
-import codegen {Codegen}
-import derive.deser_json {add_decode_json}
+import util
+import codegen { Codegen }
+import derive.deser_json { add_decode_json }
 
 fn main() {
 	// file_def := parse_code()
 	// derived_code := derive()
-	code := gencode()?
+	code := gencode() ?
 	println(code)
 }
 
@@ -28,10 +28,10 @@ pub fn decode_json<T>(src string) ?T {
 }
 
 fn gencode() ?string {
-mod_name := 'mylib'
+	mod_name := 'mylib'
 	mut gen := codegen.new_plain(mod_name: mod_name)
 
-input := '
+	input := '
 module $mod_name
 
 import x.json2
@@ -77,16 +77,13 @@ pub fn (mut self ClassName) from_json(j json2.Any) ? {
 							print(term.yellow('right'))
 							util.debug_expr(expr)
 						}
-						
 					}
 				}
 			}
 		}
 	}
 
-
 	gen.add_import('x.json2')
-
 
 	// gen.add_struct_method(struct_name: 'RegClient', is_mut: true, name: 'decode_json', return_type: my_new_type, body_stmts: [], params: [],comments: [])
 	add_decode_json(mut gen, parsed.stmts[3] as ast.StructDecl)
@@ -102,7 +99,7 @@ pub fn (mut self ClassName) from_json(j json2.Any) ? {
 // 	self.field_name = obj[js_field_name].type()
 // }
 // ```
-fn add_decode_json_exp(mut self codegen.Codegen) {
+fn add_decode_json_exp(mut self Codegen) {
 	mut body_stmts := []ast.Stmt{}
 	body_stmts << ast.AssignStmt{
 		left: [self.ident('obj')]
@@ -112,18 +109,20 @@ fn add_decode_json_exp(mut self codegen.Codegen) {
 				left: self.ident('j')
 				scope: self.scope()
 				is_method: true
-			})
+			}),
 		]
 		// op: token.Kind.assign
 		op: token.Kind.decl_assign
 		// op: token.Kind.and
 	}
 	body_stmts << ast.AssignStmt{
-		left: [ast.Expr(ast.SelectorExpr{ // 'self.field'
-			field_name: 'field_name'
-			expr: self.ident('self')
-			scope: self.scope()
-		})]
+		left: [
+			ast.Expr(ast.SelectorExpr{ // 'self.field'
+				field_name: 'field_name'
+				expr: self.ident('self')
+				scope: self.scope()
+			}),
+		]
 		right: [
 			ast.Expr(ast.CallExpr{
 				name: 'str'
@@ -140,16 +139,20 @@ fn add_decode_json_exp(mut self codegen.Codegen) {
 		// op: token.Kind.and
 	}
 	body_stmts << ast.AssignStmt{
-		left: [ast.Expr(ast.SelectorExpr{ // 'self.field'
-			field_name: 'field_name'
-			expr: self.ident('self')
-			scope: self.scope()
-		})]
+		left: [
+			ast.Expr(ast.SelectorExpr{ // 'self.field'
+				field_name: 'field_name'
+				expr: self.ident('self')
+				scope: self.scope()
+			}),
+		]
 		right: [
 			ast.Expr(ast.CallExpr{
 				name: 'str'
 				left: ast.IndexExpr{
-					index: ast.StringLiteral{val: 'js_field_name'}
+					index: ast.StringLiteral{
+						val: 'js_field_name'
+					}
 					left: self.ident('obj')
 				}
 				scope: self.scope()
@@ -163,10 +166,20 @@ fn add_decode_json_exp(mut self codegen.Codegen) {
 	// if !self.has_import('x.json2') {
 	// 	self.add_import('x.json2')
 	// }
-	mut params := [ast.Param{
-		name: 'j'
-		typ: self.find_type_or_add_placeholder('json2.Any', .v)
-	}]
+	mut params := [
+		ast.Param{
+			name: 'j'
+			typ: self.find_type_or_add_placeholder('json2.Any', .v)
+		},
+	]
 
-	self.add_struct_method(struct_name: 'JsonResponse', is_mut: true, name: 'decode_json', return_type: ast.ovoid_type, body_stmts: body_stmts, params: params ,comments: [])
+	self.add_struct_method(
+		struct_name: 'JsonResponse'
+		is_mut: true
+		name: 'decode_json'
+		return_type: ast.ovoid_type
+		body_stmts: body_stmts
+		params: params
+		comments: []
+	)
 }
