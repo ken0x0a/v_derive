@@ -1,8 +1,6 @@
 module de
 
 import v.ast { Stmt}
-import v.token
-import term
 import codegen { Codegen }
 import common
 import util {get_type_name_without_module}

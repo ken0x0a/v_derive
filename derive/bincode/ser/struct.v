@@ -2,7 +2,6 @@ module ser
 
 import v.ast { EnumDecl, Stmt, StructDecl, SumTypeDecl }
 import v.token
-import term
 import codegen { Codegen }
 import common
 import util { get_type_name_without_module }

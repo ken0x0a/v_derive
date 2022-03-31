@@ -2,7 +2,6 @@ module ser
 
 import v.ast { Stmt }
 import v.token
-import term
 import codegen { Codegen }
 import util { get_type_name_without_module }
 

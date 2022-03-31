@@ -1,7 +1,6 @@
 module ser
 
 import v.ast { EnumDecl, Stmt }
-import v.token
 import codegen { Codegen }
 import common
 import util {get_type_name_without_module}

@@ -1,11 +1,8 @@
 module codegen
 
 import v.ast
-// import v.checker
 import v.fmt
 import v.pref
-// import v.token
-import util
 
 pub struct Codegen {
 	mod string
@@ -42,14 +39,14 @@ pub struct NewPlainArgs {
 }
 
 pub struct NewWithAllArgs {
-	mod_name string
+	mod_name string = 'main'
 	scope    &ast.Scope = &ast.Scope{ parent: 0 }
 	file     &ast.File
 	table    &ast.Table
 }
 
 pub struct NewWithTableArgs {
-	mod_name string
+	mod_name string = 'main'
 	table    &ast.Table
 }
 
