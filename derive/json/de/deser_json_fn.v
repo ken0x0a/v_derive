@@ -3,6 +3,8 @@ module de
 import v.ast
 import codegen { Codegen }
 
+const if_guard_var_name = 'k'
+
 struct DeserJsonFn {
 mut:
 	gen           Codegen    [required]
@@ -103,37 +105,54 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 			// fn_name := '${get_decode_fn_name(stmt.name)}'
 			fn_name := get_decode_map_fn_name(type_arg, map_depth)
 			register_map_fn_if_not_exist(mut self, typ, type_arg, fn_name, map_depth)
-			return ast.Expr(ast.CallExpr{
-				name: fn_name
-				args: [
-					ast.CallArg{
-						expr: ast.CallExpr{
-							name: 'as_map'
-							left: ast.IndexExpr{
+
+			return ast.Expr(ast.IfExpr{
+				branches: [
+					ast.IfBranch{
+						scope: self.scope()
+						cond: ast.Expr(ast.IfGuardExpr{
+							vars: [
+								ast.IfGuardVar{
+									name: de.if_guard_var_name
+								},
+							]
+							expr: ast.IndexExpr{
 								index: self.string_literal(js_field_name)
+								// left: self.ident(decode_json_fn_arg_name)
 								left: self.ident(json2_map_name)
-								or_expr: ast.OrExpr{
-									kind: .block
-									stmts: [
-										ast.Stmt(ast.ExprStmt{
-											expr: ast.MapInit{
-												typ: typ
-											}
-										}),
-									]
-								} // ast.CastExpr('json2.Any')
 							}
-							scope: self.scope()
-							is_method: true
-						}
+						})
+						stmts: [
+							ast.Stmt(ast.ExprStmt{
+								expr: ast.Expr(ast.CallExpr{
+									name: fn_name
+									args: [
+										ast.CallArg{
+											expr: self.ident(de.if_guard_var_name)
+										},
+									]
+									scope: self.scope()
+									is_method: false // left: self.ident('j')
+									or_block: ast.OrExpr{
+										kind: .propagate
+									}
+								})
+							}),
+						]
+					},
+					ast.IfBranch{
+						scope: self.scope()
+						stmts: [
+							ast.Stmt(ast.ExprStmt{
+								expr: ast.MapInit{
+									typ: typ
+								}
+							}),
+						]
 					},
 				]
-				// concrete_types: [type_arg_idx]
-				scope: self.scope()
-				is_method: false // left: self.ident('j')
-				or_block: ast.OrExpr{
-					kind: .propagate
-				}
+				is_expr: false
+				has_else: true
 			})
 		} else if type_sym.name.starts_with('[') {
 			// array
