@@ -26,9 +26,15 @@ fn get_deser_array_expr_recursively(mut self Codegen, field ast.Expr, typ ast.Ty
 
 // Generates
 //
-// obj['field_name'].arr() or { []json2.Any{} }.map(decode_fn_name(it))
-// obj['field_name'].arr() or { []json2.Any{} }.map(it.str())
-// obj['field_name'].arr() or { []json2.Any{} }.map(it.int())
+// obj['field_name'] or { []json2.Any{} }.arr().map(decode_fn_name(it))
+// obj['field_name'] or { []json2.Any{} }.arr().map(it.str())
+// obj['field_name'] or { []json2.Any{} }.arr().map(it.int())
+// TODO: update from ↑ to ↓
+// if k := obj['field_name'] {
+// 	k.arr().map(it.int())
+// } else {
+// 	[]json2.Any{}
+// }
 fn get_deser_array_expr(mut self Codegen, typ ast.Type, js_field_name string) ast.Expr {
 	type_sym := self.table.sym(typ)
 	depth, type_arg := get_array_depth_and_type_arg(type_sym.name)
