@@ -14,7 +14,12 @@ pub fn (mut p Codegen) find_type_or_add_placeholder(name string, language ast.La
 			eprintln(term.red('not found type "$name"'))
 			dump(name)
 		}
-		if name.starts_with('map[') {
+		if name.starts_with('[]') {
+			elem_type_name := name[2..]
+			elem_type := p.find_type_or_add_placeholder(elem_type_name, .v)
+			typ_idx := p.table.find_or_register_array(elem_type)
+			return ast.new_type(typ_idx)
+		} else if name.starts_with('map[') {
 			parts := name[4..].split_nth(']', 2)
 			map_type_idx := p.table.find_or_register_map(p.find_type_or_add_placeholder(parts[0],
 				.v), p.find_type_or_add_placeholder(parts[1], .v))
