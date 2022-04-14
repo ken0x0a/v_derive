@@ -36,9 +36,6 @@ pub fn str_to_type(typ string) ast.Type {
 		'byte' {
 			ast.byte_type
 		}
-		'u8' {
-			ast.u8_type
-		}
 		'u16' {
 			ast.u16_type
 		}

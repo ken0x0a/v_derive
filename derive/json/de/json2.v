@@ -70,10 +70,6 @@ fn get_json2_method_name(typ ast.Type) (string, ast.Type) {
 		// ast.int_literal_type_idx   { 'int' }
 		// ast.thread_type_idx        {  }
 		// ast.error_type_idx         {  }
-		ast.u8_type_idx {
-			cast_type = ast.byte_type
-			'u64'
-		}
 		else {
 			dump(typ)
 			panic('unexpected!! typ $typ')
@@ -87,7 +83,7 @@ fn get_json2_default_value(typ ast.Type) ast.Stmt {
 	return match typ {
 		ast.i8_type_idx, ast.i16_type_idx, ast.int_type_idx, ast.i64_type_idx, ast.isize_type_idx,
 		ast.byte_type_idx, ast.u16_type_idx, ast.u32_type_idx, ast.u64_type_idx,
-		ast.usize_type_idx, ast.f32_type_idx, ast.f64_type_idx, ast.u8_type_idx {
+		ast.usize_type_idx, ast.f32_type_idx, ast.f64_type_idx {
 			cg.integer_literal_stmt(0)
 		}
 		ast.bool_type_idx {
