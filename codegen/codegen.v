@@ -306,7 +306,7 @@ pub fn (mut self Codegen) gen_fn(opt GenFnDeclOpt) ast.Stmt {
 		stmts: opt.body_stmts
 		name: opt.name
 		scope: self.scope
-		comments: opt.comments
+		// comments: opt.comments
 		attrs: opt.attrs
 		is_pub: opt.is_pub
 	}
@@ -398,7 +398,7 @@ fn (mut self Codegen) gen_struct_method(opt GenStructMethodOpt) ast.Stmt {
 		stmts: opt.body_stmts
 		name: opt.name
 		scope: self.scope
-		comments: opt.comments
+		// comments: opt.comments
 		is_method: true
 		is_pub: opt.is_pub
 		rec_mut: opt.is_mut
