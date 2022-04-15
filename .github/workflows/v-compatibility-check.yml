@@ -104,7 +104,7 @@ jobs:
         working-directory: ${{ env.REPO_DIR }}
 
       - name: Update state
-        run: echo -n "${{needs.check-hash.outputs.hash}}" > ./${{ env.HASH_STATE_FILE }}
+        run: echo -n "${{ needs.check-hash.outputs.hash }}" > ./${{ env.HASH_STATE_FILE }}
 
       - name: set prev hash
         if: failure()
