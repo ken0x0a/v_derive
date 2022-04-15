@@ -5,7 +5,7 @@ import v.token
 import codegen { Codegen }
 import util { get_type_name_without_module }
 
-const (
+pub const (
 	macro_name                 = 'BinEncode'
 	mod_name                   = 'bincode'
 	const_str_0_bytes_for_len  = 'num_bytes_for_len'
