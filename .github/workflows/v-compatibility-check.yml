@@ -64,10 +64,13 @@ jobs:
     steps:
       - name: Load latest hash
         id: last-hash
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./${{ env.HASH_STATE_FILE }}
-          key: key-${{ env.HASH_STATE_FILE }}
+          key: key-${{ env.HASH_STATE_FILE }}-${{ runner.os }}-${{ needs.check-hash.outputs.hash }}
+          restore-keys: |
+            key-${{ env.HASH_STATE_FILE }}-${{ runner.os }}-
+            key-${{ env.HASH_STATE_FILE }}-
       - name: \[pre] V (checkout)
         uses: actions/checkout@v2
         with:
@@ -113,6 +116,6 @@ jobs:
       - name: Report V_REPO Hash to Discord
         if: failure()
         run: |
-          curl -X POST -H "Content-Type: application/json" -d '{"content": "**${{ github.repository }}** start failing after \"${{ steps.prev_hash.outputs.value }}\" .. \"${{ needs.check-hash.outputs.hash }}\"\n<${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}>\n<https://github.com/vlang/v/compare/${{ steps.prev_hash.outputs.value }}...${{ needs.check-hash.outputs.hash }}>"}' $DISCORD_WEBHOOK_URL
+          curl -X POST -H "Content-Type: application/json" -d '{"content": "[${{ runner.os }}] **${{ github.repository }}** start failing after \"${{ steps.prev_hash.outputs.value }}\" .. \"${{ needs.check-hash.outputs.hash }}\"\n<${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}>\n<https://github.com/vlang/v/compare/${{ steps.prev_hash.outputs.value }}...${{ needs.check-hash.outputs.hash }}>"}' $DISCORD_WEBHOOK_URL
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
