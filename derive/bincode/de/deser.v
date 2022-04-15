@@ -126,8 +126,7 @@ pub fn add_decode_fn_for_struct(mut cg Codegen, decl ast.StructDecl) {
 pub fn add_decode_method_for_struct(mut cg Codegen, decl ast.StructDecl) {
 	fn_name := common.get_fn_name_decode(decl.name)
 	mut params := []ast.Param{cap: decl.fields.len}
-	return_type := cg.find_type_or_add_placeholder(get_type_name_without_module(decl.name),
-		.v)
+	// return_type := cg.find_type_or_add_placeholder(get_type_name_without_module(decl.name), .v)
 
 	mut body_stmts := []Stmt{cap: decl.fields.len + 2}
 	cg.add_struct_method(
