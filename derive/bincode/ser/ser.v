@@ -12,7 +12,7 @@ pub const (
 )
 
 const (
-	ident_name_bytes = 'b'
+	ident_name_bytes      = 'b'
 	ident_name_encode_pos = 'pos'
 )
 
@@ -38,11 +38,14 @@ fn base_assign_stmt(mut cg Codegen) Stmt {
 }
 
 fn get_params(mut cg Codegen) []ast.Param {
-	return [ast.Param{
-		name: ident_name_bytes
-		typ: cg.find_type_or_add_placeholder(get_type_name_without_module('[]byte'),.v)
-		is_mut: true
-	}]
+	return [
+		ast.Param{
+			name: ident_name_bytes
+			typ: cg.find_type_or_add_placeholder(get_type_name_without_module('[]u8'),
+				.v)
+			is_mut: true
+		},
+	]
 }
 
 // Generates
@@ -50,9 +53,9 @@ fn get_params(mut cg Codegen) []ast.Param {
 // [derive: 'DeserBincode,SerBincode']
 // type OneOf = ItemA | ItemB
 //
-// fn bin_decode__one_of(buf []byte) OneOf {
+// fn bin_decode__one_of(buf []u8) OneOf {
 // 	mut pos := 0
-// 	typ := decode<byte>(buf)
+// 	typ := decode<u8>(buf)
 // 	pos += encode_len(typ)
 // 	match typ {
 // 		1 { return OneOf(bin_decode__item_a(buf[pos..])) }
@@ -60,12 +63,12 @@ fn get_params(mut cg Codegen) []ast.Param {
 // 		else { panic('Unsupported type `$typ`') }
 // 	}
 // }
-// pub fn (self OneOf) bin_decode(buf []byte) OneOf {
+// pub fn (self OneOf) bin_decode(buf []u8) OneOf {
 // 	return bin_decode__one_of(buf)
 // }
 // pub fn (self OneOf) bin_encode_len() int {
 // 	mut len := 0
-// 	len += encode_len_for<byte>()
+// 	len += encode_len_for<u8>()
 // 	len += match self {
 // 		ItemA { self.bin_encode_len() }
 // 		ItemB { self.bin_encode_len() }
@@ -73,14 +76,14 @@ fn get_params(mut cg Codegen) []ast.Param {
 // 	return len
 // }
 //
-// pub fn (self OneOf) bin_encode(mut buf []byte) {
+// pub fn (self OneOf) bin_encode(mut buf []u8) {
 // 	mut pos := 0
 // 	typ := match self {
-// 		ItemA { byte(1) }
-// 		ItemB { byte(2) }
+// 		ItemA { u8(1) }
+// 		ItemB { u8(2) }
 // 	}
 // 	encode(mut buf, typ)
-// 	pos += encode_len_for<byte>()
+// 	pos += encode_len_for<u8>()
 // 	match self {
 // 		ItemA {
 // 			dump(self)

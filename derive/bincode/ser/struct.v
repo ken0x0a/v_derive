@@ -7,7 +7,7 @@ import common
 import util { get_type_name_without_module }
 
 // ```v
-// pub fn (self Product) bin_encode(mut buf []byte) int {
+// pub fn (self Product) bin_encode(mut buf []u8) int {
 // 	mut pos := 0
 // 	pos += bincode.encode(mut buf, self.name)
 // 	pos += bincode.encode(mut buf[pos..], self.desc)
