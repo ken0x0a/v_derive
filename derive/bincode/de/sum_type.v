@@ -1,16 +1,16 @@
 module de
 
-import v.ast { Stmt}
+import v.ast { Stmt }
 import v.token
 import codegen { Codegen }
 import common
-import util {get_type_name_without_module}
+import util { get_type_name_without_module }
 
 // generates
 // ```vlang
-// fn bin_decode__one_of(buf []byte, mut d_len &int) OneOf {
+// fn bin_decode__one_of(buf []u8, mut d_len &int) OneOf {
 // 	mut pos := 0
-// 	typ := decode<byte>(buf, mut pos)
+// 	typ := decode<u8>(buf, mut pos)
 // 	defer {
 // 		d_len += pos
 // 	}
@@ -24,8 +24,9 @@ import util {get_type_name_without_module}
 pub fn add_decode_fn_for_sumtype_fn(mut cg Codegen, decl ast.SumTypeDecl) {
 	fn_name := common.get_fn_name_decode(decl.name)
 	mut params := get_params(mut cg)
-	return_type := cg.find_type_or_add_placeholder(get_type_name_without_module(decl.name), .v)
-	typ_sym := cg.table.find_sym(decl.name) or {panic(err)}
+	return_type := cg.find_type_or_add_placeholder(get_type_name_without_module(decl.name),
+		.v)
+	typ_sym := cg.table.find_sym(decl.name) or { panic(err) }
 
 	mut body_stmts := []Stmt{cap: decl.variants.len + 2}
 	body_stmts << base_assign_stmt(mut cg)
@@ -34,19 +35,21 @@ pub fn add_decode_fn_for_sumtype_fn(mut cg Codegen, decl ast.SumTypeDecl) {
 	ident_typ := cg.ident('typ')
 	body_stmts << ast.AssignStmt{
 		left: [ident_typ]
-		right: [ast.Expr(ast.CallExpr{
-			name: 'decode',
-			left: cg.ident(common.mod_name)
-			scope: cg.scope()
-			is_method: true
-			concrete_types: [ast.byte_type]
-			args: [ast.CallArg{
-				expr: cg.ident(ident_name_bytes)
-			}, ast.CallArg{
-				expr: cg.ident(ident_name_decode_pos)
-				is_mut: true
-			}]
-		})]
+		right: [
+			ast.Expr(ast.CallExpr{
+				name: 'decode'
+				left: cg.ident(common.mod_name)
+				scope: cg.scope()
+				is_method: true
+				concrete_types: [ast.byte_type]
+				args: [ast.CallArg{
+					expr: cg.ident(ident_name_bytes)
+				}, ast.CallArg{
+					expr: cg.ident(ident_name_decode_pos)
+					is_mut: true
+				}]
+			}),
+		]
 		op: token.Kind.decl_assign
 	}
 	body_stmts << ast.ExprStmt{
@@ -88,23 +91,31 @@ fn gen_sumtype_match_expr(mut cg Codegen, decl ast.SumTypeDecl, return_type ast.
 			scope: cg.scope()
 			exprs: [cg.integer_literal(idx + 1)]
 			stmts: [
-				ast.Stmt(ast.Return{
-					exprs: [ast.Expr(ast.CastExpr{
-						typ: return_type
-						expr: ast.CallExpr{
-							name: fn_name
-							scope: cg.scope()
-							args: [ast.CallArg{
-								expr: ast.IndexExpr{
-									left: cg.ident(ident_name_bytes)
-									index: ast.RangeExpr{has_low: true, low: cg.ident(ident_name_decode_pos)}
-								}
-							}, ast.CallArg{
-								expr: cg.ident(ident_name_decode_pos)
-								is_mut: true
-							}]
-						}
-					})]
+				Stmt(ast.Return{
+					exprs: [
+						ast.Expr(ast.CastExpr{
+							typ: return_type
+							expr: ast.CallExpr{
+								name: fn_name
+								scope: cg.scope()
+								args: [
+									ast.CallArg{
+										expr: ast.IndexExpr{
+											left: cg.ident(ident_name_bytes)
+											index: ast.RangeExpr{
+												has_low: true
+												low: cg.ident(ident_name_decode_pos)
+											}
+										}
+									},
+									ast.CallArg{
+										expr: cg.ident(ident_name_decode_pos)
+										is_mut: true
+									},
+								]
+							}
+						}),
+					]
 				}),
 			]
 		}
@@ -113,13 +124,15 @@ fn gen_sumtype_match_expr(mut cg Codegen, decl ast.SumTypeDecl, return_type ast.
 		scope: cg.scope()
 		is_else: true
 		stmts: [
-			ast.Stmt(ast.ExprStmt{
+			Stmt(ast.ExprStmt{
 				expr: ast.CallExpr{
 					name: 'panic'
 					scope: cg.scope()
-					args: [ast.CallArg{
-						expr: cg.string_literal('Unsupported type `\$typ` < $decl.variants.len')
-					}]
+					args: [
+						ast.CallArg{
+							expr: cg.string_literal('Unsupported type `\$typ` < $decl.variants.len')
+						},
+					]
 				}
 			}),
 		]

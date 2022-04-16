@@ -1,6 +1,6 @@
 module common
 
-import v.ast { EnumDecl, Stmt, StructDecl, SumTypeDecl }
+import v.ast { Stmt }
 import v.token
 import codegen { Codegen }
 import util { get_type_name_without_module }

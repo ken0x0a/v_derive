@@ -1,50 +1,58 @@
 module de
 
-import v.ast { Stmt}
+import v.ast { Stmt }
 import codegen { Codegen }
 import common
-import util {get_type_name_without_module}
+import util { get_type_name_without_module }
 
 fn get_params(mut cg Codegen) []ast.Param {
-	return [ast.Param{
-		name: ident_name_bytes
-		typ: cg.find_type_or_add_placeholder(get_type_name_without_module('[]byte'),.v)
-	}, ast.Param{
-		name: ident_name_decoded_len
-		typ: ast.int_type.ref()
-		is_mut: true
-	}]
+	return [
+		ast.Param{
+			name: ident_name_bytes
+			typ: cg.find_type_or_add_placeholder(get_type_name_without_module('[]u8'),
+				.v)
+		},
+		ast.Param{
+			name: ident_name_decoded_len
+			typ: ast.int_type.ref()
+			is_mut: true
+		},
+	]
 }
+
 // generates
 // ```vlang
-// fn bin_decode__error_code(b []byte) ErrorCode {
+// fn bin_decode__error_code(b []u8) ErrorCode {
 // 	return ErrorCode(bincode.decode<int>(b))
 // }
 // ```
 pub fn add_decode_fn_for_enum(mut cg Codegen, decl ast.EnumDecl) {
 	fn_name := common.get_fn_name_decode(decl.name)
 	mut params := get_params(mut cg)
-	return_type := cg.find_type_or_add_placeholder(get_type_name_without_module(decl.name), .v)
-	typ_sym := cg.table.find_sym(decl.name) or {panic(err)}
+	return_type := cg.find_type_or_add_placeholder(get_type_name_without_module(decl.name),
+		.v)
+	typ_sym := cg.table.find_sym(decl.name) or { panic(err) }
 
 	mut body_stmts := []Stmt{cap: 1}
 	body_stmts << Stmt(ast.Return{
-		exprs: [ast.Expr(ast.CastExpr{
-			typ: return_type
-			expr: ast.CallExpr{
-				name: 'decode',
-				left: cg.ident(common.mod_name)
-				scope: cg.scope()
-				is_method: true
-				concrete_types: [ast.int_type]
-				args: [ast.CallArg{
-					expr: cg.ident(ident_name_bytes)
-				}, ast.CallArg{
-					expr: cg.ident(ident_name_decoded_len)
-					is_mut: true
-				}]
-			}
-		})]
+		exprs: [
+			ast.Expr(ast.CastExpr{
+				typ: return_type
+				expr: ast.CallExpr{
+					name: 'decode'
+					left: cg.ident(common.mod_name)
+					scope: cg.scope()
+					is_method: true
+					concrete_types: [ast.int_type]
+					args: [ast.CallArg{
+						expr: cg.ident(ident_name_bytes)
+					}, ast.CallArg{
+						expr: cg.ident(ident_name_decoded_len)
+						is_mut: true
+					}]
+				}
+			}),
+		]
 	})
 	// ## Register to table
 	fn_def := ast.Fn{
