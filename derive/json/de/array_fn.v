@@ -76,7 +76,7 @@ fn get_deser_array_expr(mut self Codegen, typ ast.Type, js_field_name string) as
 				},
 			]
 			or_block: ast.OrExpr{
-				kind: .propagate
+				kind: .propagate_option
 			}
 			scope: self.scope()
 		})
@@ -125,7 +125,7 @@ fn get_deser_array_expr(mut self Codegen, typ ast.Type, js_field_name string) as
 	// 	scope: self.scope()
 	// 	is_method: false // left: self.ident('j')
 	// 	or_block: ast.OrExpr{
-	// 		kind: .propagate
+	// 		kind: .propagate_option
 	// 	}
 	// }
 }
@@ -199,7 +199,7 @@ fn register_array_fn_if_not_exist(mut self Codegen, typ ast.Type, typ_arg string
 							scope: self.scope()
 							is_method: false
 							or_block: ast.OrExpr{
-								kind: .propagate
+								kind: .propagate_option
 							}
 						}),
 					]

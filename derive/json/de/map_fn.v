@@ -84,7 +84,7 @@ fn register_map_fn_if_not_exist(mut self Codegen, typ ast.Type, typ_arg string, 
 							scope: self.scope()
 							is_method: false
 							or_block: ast.OrExpr{
-								kind: .propagate
+								kind: .propagate_option
 							}
 						}),
 					]

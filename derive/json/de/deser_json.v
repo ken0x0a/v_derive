@@ -120,7 +120,7 @@ fn get_assign_right_expr(mut self Codegen, field_name string, js_field_name stri
 				scope: self.scope()
 				is_method: false // left: self.ident('j')
 				or_block: ast.OrExpr{
-					kind: .propagate
+					kind: .propagate_option
 				}
 			})
 		} else if type_sym.name.starts_with('[') {
@@ -150,7 +150,7 @@ fn get_assign_right_expr(mut self Codegen, field_name string, js_field_name stri
 				scope: self.scope()
 				is_method: false // left: self.ident('j')
 				or_block: ast.OrExpr{
-					kind: .propagate
+					kind: .propagate_option
 				}
 			})
 		}
@@ -193,7 +193,7 @@ fn get_assign_right_expr(mut self Codegen, field_name string, js_field_name stri
 			scope: self.scope()
 			is_method: false // left: self.ident('j')
 			or_block: ast.OrExpr{
-				kind: .propagate
+				kind: .propagate_option
 			}
 		})
 		// }

@@ -134,7 +134,7 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 									scope: self.scope()
 									is_method: false // left: self.ident('j')
 									or_block: ast.OrExpr{
-										kind: .propagate
+										kind: .propagate_option
 									}
 								})
 							}),
@@ -181,7 +181,7 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 			// 	scope: self.scope()
 			// 	is_method: false // left: self.ident('j')
 			// 	or_block: ast.OrExpr{
-			// 		kind: .propagate
+			// 		kind: .propagate_option
 			// 	}
 			// })
 		}
@@ -232,7 +232,7 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 			scope: self.scope()
 			is_method: false // left: self.ident('j')
 			or_block: ast.OrExpr{
-				kind: .propagate
+				kind: .propagate_option
 			}
 		})
 		// }
@@ -285,7 +285,7 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 fn get_json2_map_index_or_expr(is_required bool, typ ast.Type) ast.OrExpr {
 	return if is_required {
 		ast.OrExpr{
-			kind: .propagate
+			kind: .propagate_option
 		}
 	} else {
 		default_value := get_json2_default_value(typ)

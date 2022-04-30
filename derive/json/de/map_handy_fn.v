@@ -93,14 +93,14 @@ module de
 // 								left: [ast.Expr(ast.IndexExpr{
 // 									index: self.ident('key')
 // 									left: self.ident('res')
-// 									or_expr: ast.OrExpr{ kind: .propagate } // ast.CastExpr('json2.Any')
+// 									or_expr: ast.OrExpr{ kind: .propagate_option } // ast.CastExpr('json2.Any')
 // 								})]
 // 								right: [
 // 									ast.Expr(ast.CallExpr{
 // 										name: 'cb'
 // 										args: [ast.CallArg { expr: self.ident('val') }]
 // 										scope: self.scope(), is_method: false
-// 										or_block: ast.OrExpr{ kind: .propagate }
+// 										or_block: ast.OrExpr{ kind: .propagate_option }
 // 									})
 // 								]
 // 								// op: token.Kind.assign
