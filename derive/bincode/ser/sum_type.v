@@ -63,7 +63,7 @@ fn plus_assign_sumtype_match(mut cg Codegen, decl ast.SumTypeDecl) ast.Stmt {
 						left: cg.ident(common.mod_name)
 						scope: cg.scope()
 						is_method: true
-						concrete_types: [ast.byte_type]
+						concrete_types: [ast.u8_type]
 						args: [
 							ast.CallArg {expr: cg.ident(ident_name_bytes), is_mut: true},
 							ast.CallArg {expr: cg.integer_literal(idx + 1)}

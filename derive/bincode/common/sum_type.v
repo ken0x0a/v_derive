@@ -47,7 +47,7 @@ pub fn add_len_fn_for_sumtype(mut cg Codegen, decl SumTypeDecl) {
 fn plus_assign_sumtype_type(mut cg Codegen) Stmt {
 	right := ast.Expr(ast.CallExpr{
 		name: 'len_for'
-		concrete_types: [ast.byte_type]
+		concrete_types: [ast.u8_type]
 		left: cg.ident(mod_name)
 		scope: cg.scope()
 		is_method: true

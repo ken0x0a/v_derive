@@ -14,7 +14,7 @@ pub fn str_from_type(typ ast.Type) string {
 		ast.i16_type           { 'ast.i16_type' }
 		ast.i64_type           { 'ast.i64_type' }
 		ast.isize_type         { 'ast.isize_type' }
-		ast.byte_type          { 'ast.byte_type' }
+		ast.u8_type            { 'ast.u8_type' }
 		ast.u16_type           { 'ast.u16_type' }
 		ast.u32_type           { 'ast.u32_type' }
 		ast.u64_type           { 'ast.u64_type' }

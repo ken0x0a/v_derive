@@ -33,8 +33,8 @@ pub fn str_to_type(typ string) ast.Type {
 		'i64' {
 			ast.i64_type
 		}
-		'byte' {
-			ast.byte_type
+		'u8' {
+			ast.u8_type
 		}
 		'u16' {
 			ast.u16_type

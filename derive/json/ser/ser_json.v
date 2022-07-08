@@ -123,7 +123,7 @@ pub fn ser_json_get_default_expr(typ ast.Type) ast.Expr {
 		ast.isize_type {
 			return codegen.integer_literal(-isize(usize(-1) / 2))
 		}
-		ast.byte_type {
+		ast.u8_type {
 			return codegen.integer_literal(byte(-1))
 		}
 		ast.u16_type {
@@ -292,7 +292,7 @@ fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.E
 					field_sel
 				}
 			}
-			ast.i8_type, ast.int_type, ast.i16_type, ast.i64_type, ast.isize_type, ast.byte_type,
+			ast.i8_type, ast.int_type, ast.i16_type, ast.i64_type, ast.isize_type, ast.u8_type,
 			ast.u16_type, ast.u32_type, ast.u64_type, ast.usize_type {
 				if ser_as == 'str' {
 					ast.Expr(ast.CallExpr{

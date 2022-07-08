@@ -41,7 +41,7 @@ pub fn add_decode_fn_for_sumtype_fn(mut cg Codegen, decl ast.SumTypeDecl) {
 				left: cg.ident(common.mod_name)
 				scope: cg.scope()
 				is_method: true
-				concrete_types: [ast.byte_type]
+				concrete_types: [ast.u8_type]
 				args: [ast.CallArg{
 					expr: cg.ident(ident_name_bytes)
 				}, ast.CallArg{
