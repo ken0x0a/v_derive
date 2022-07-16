@@ -26,11 +26,11 @@ pub fn (mut self Codegen) scope_into_parent() {
 	self.scope = self.scope.parent
 }
 
-pub fn (self Codegen) scope() &ast.Scope {
+pub fn (self &Codegen) scope() &ast.Scope {
 	return self.scope
 }
 
-pub fn (self Codegen) to_code_string() string {
+pub fn (self &Codegen) to_code_string() string {
 	return fmt.fmt(self.file, self.table, &pref.Preferences{}, false)
 }
 
@@ -102,7 +102,7 @@ pub fn (mut self Codegen) add_file_comments(texts ...string) {
 	}
 }
 
-pub fn (self Codegen) has_import(name string) bool {
+pub fn (self &Codegen) has_import(name string) bool {
 	for imp in self.file.imports {
 		if imp.mod == name {
 			return true
@@ -134,7 +134,7 @@ pub fn (mut self Codegen) add_import_opt(opt ImportOpt) {
 	}
 }
 
-pub fn (self Codegen) gen_import(name string) ast.Import {
+pub fn (self &Codegen) gen_import(name string) ast.Import {
 	return ast.Import{
 		mod: name
 		alias: name.split('.').last()
@@ -323,6 +323,7 @@ pub struct GenStructMethodOpt {
 	receiver_type ast.Type
 	is_pub        bool = true
 	is_mut        bool // => rec_mut is_self_mut
+	is_ref        bool = true
 }
 
 pub fn (mut self Codegen) add_struct_method(opt GenStructMethodOpt) {
@@ -347,7 +348,7 @@ pub fn (mut self Codegen) add_struct_method(opt GenStructMethodOpt) {
 	mut type_sym := self.table.sym(typ_idx)
 	// dump(type_sym)
 
-	if opt.is_mut {
+	if opt.is_mut || opt.is_ref {
 		typ = typ.ref()
 	}
 

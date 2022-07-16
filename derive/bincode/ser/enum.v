@@ -42,6 +42,7 @@ pub fn add_encode_fn_for_enum(mut cg Codegen, decl EnumDecl) {
 	cg.add_struct_method(
 		struct_name: decl.name.split('.').last()
 		is_mut: false
+		is_ref: false
 		name: fn_name
 		return_type: return_type
 		body_stmts: body_stmts
