@@ -21,7 +21,7 @@ fn get_array_depth_and_type_arg(type_name string) (int, string) {
 fn get_deser_array_expr_recursively(mut self Codegen, field ast.Expr, typ ast.Type) ast.Expr {
 	dump('')
 	panic('')
-	return ast.empty_expr()
+	return ast.empty_expr
 }
 
 // Generates
@@ -144,19 +144,24 @@ fn register_array_fn_if_not_exist(mut self Codegen, typ ast.Type, typ_arg string
 				left: [self.ident(json2_map_name)]
 				right: [
 					ast.Expr(ast.CallExpr{
-					name: 'as_map'
-					left: self.ident(json2_any_param_name)
-					scope: self.scope()
-					is_method: true
-				})]
+						name: 'as_map'
+						left: self.ident(json2_any_param_name)
+						scope: self.scope()
+						is_method: true
+					}),
+				]
 				op: token.Kind.decl_assign // op: token.Kind.and // op: token.Kind.assign
 			}),
 			//
 			ast.Stmt(ast.AssignStmt{
-				left: [self.ident_opt('res', is_mut: true)]
-				right: [ast.Expr(ast.MapInit{
-					typ: typ
-				})]
+				left: [
+					self.ident_opt('res', is_mut: true),
+				]
+				right: [
+					ast.Expr(ast.MapInit{
+						typ: typ
+					}),
+				]
 				op: token.Kind.decl_assign // op: token.Kind.and // op: token.Kind.assign
 			}),
 			// ast.Stmt(ast.AssignStmt{
@@ -180,36 +185,41 @@ fn register_array_fn_if_not_exist(mut self Codegen, typ ast.Type, typ_arg string
 				scope: self.scope()
 				stmts: [
 					ast.Stmt(ast.AssignStmt{
-					left: [
-						ast.Expr(ast.IndexExpr{
-							index: self.ident('key')
-							left: self.ident('res')
-						}),
-					]
-					right: [
-						ast.Expr(ast.CallExpr{
-							name: if depth == 1 {
-								get_decode_fn_name(typ_arg)
-							} else {
-								get_decode_map_fn_name(typ_arg, depth - 1)
-							}
-							args: [ast.CallArg{
-								expr: self.ident('val')
-							}]
-							scope: self.scope()
-							is_method: false
-							or_block: ast.OrExpr{
-								kind: .propagate_option
-							}
-						}),
-					]
-					// op: token.Kind.assign
-					op: token.Kind.assign
-					// op: token.Kind.and
-				})]
+						left: [
+							ast.Expr(ast.IndexExpr{
+								index: self.ident('key')
+								left: self.ident('res')
+							}),
+						]
+						right: [
+							ast.Expr(ast.CallExpr{
+								name: if depth == 1 {
+									get_decode_fn_name(typ_arg)
+								} else {
+									get_decode_map_fn_name(typ_arg, depth - 1)
+								}
+								args: [
+									ast.CallArg{
+										expr: self.ident('val')
+									},
+								]
+								scope: self.scope()
+								is_method: false
+								or_block: ast.OrExpr{
+									kind: .propagate_option
+								}
+							}),
+						]
+						// op: token.Kind.assign
+						op: token.Kind.assign
+						// op: token.Kind.and
+					}),
+				]
 			},
 			ast.Return{
-				exprs: [self.ident('res')]
+				exprs: [
+					self.ident('res'),
+				]
 			},
 		]
 

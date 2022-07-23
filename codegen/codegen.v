@@ -194,7 +194,7 @@ pub fn (mut self Codegen) ident(name string) ast.Expr {
 [inline]
 pub fn (mut self Codegen) gen_blank_stmt() ast.Stmt {
 	return ast.Stmt(ast.ExprStmt{
-		expr: ast.empty_expr()
+		expr: ast.empty_expr
 	})
 }
 

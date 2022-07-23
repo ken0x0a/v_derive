@@ -237,9 +237,9 @@ fn (mut inst DeserJsonFn) get_assign_right_expr__fn(field ast.StructField) ast.E
 		})
 		// }
 	} else if typ == ast.array_type_idx {
-		return ast.Expr(ast.EmptyExpr{}) // TODO:
+		return ast.Expr(ast.EmptyExpr(0)) // TODO:
 	} else if typ == ast.map_type_idx {
-		return ast.Expr(ast.EmptyExpr{}) // TODO:
+		return ast.Expr(ast.EmptyExpr(0)) // TODO:
 	} else if field.attrs.contains(attr_json2_as) {
 		// .${method_name_josn2}().${method_name_chain}()
 		method_name_josn2 := field.attrs.filter(it.name == attr_json2_as)[0].arg

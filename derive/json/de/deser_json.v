@@ -61,11 +61,12 @@ fn get_decode_json_base_stmts(mut self Codegen) []ast.Stmt {
 			left: [self.ident(de.json2_map_name)]
 			right: [
 				ast.Expr(ast.CallExpr{
-				name: 'as_map'
-				left: self.ident('j')
-				scope: self.scope()
-				is_method: true
-			})]
+					name: 'as_map'
+					left: self.ident('j')
+					scope: self.scope()
+					is_method: true
+				}),
+			]
 			// op: token.Kind.assign
 			op: token.Kind.decl_assign
 			// op: token.Kind.and
@@ -198,9 +199,9 @@ fn get_assign_right_expr(mut self Codegen, field_name string, js_field_name stri
 		})
 		// }
 	} else if typ == ast.array_type_idx {
-		return ast.Expr(ast.EmptyExpr{}) // TODO:
+		return ast.Expr(ast.EmptyExpr(0)) // TODO:
 	} else if typ == ast.map_type_idx {
-		return ast.Expr(ast.EmptyExpr{}) // TODO:
+		return ast.Expr(ast.EmptyExpr(0)) // TODO:
 	} else {
 		method_name, cast_type := get_json2_method_name(typ)
 		mut expr := ast.Expr(ast.CallExpr{
