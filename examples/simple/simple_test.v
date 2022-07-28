@@ -10,7 +10,7 @@ fn test_struct_item() ? {
 	assert item.name == 'Cool Stuff'
 	assert item.price == 999.9
 
-	output := item.to_json()
+	output := item.to_json().str()
 
 	assert input == output
 }
