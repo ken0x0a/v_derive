@@ -1,7 +1,6 @@
 module codegen
 
 import v.ast
-import v.parser
 
 pub fn integer_literal_stmt<T>(val T) ast.Stmt {
 	return ast.ExprStmt{
@@ -58,11 +57,11 @@ pub fn bool_literal(val bool) ast.Expr {
 // self.scope_into_parent()
 // ```
 pub fn (mut self Codegen) parse_stmt(code string) ast.Stmt {
-	return parser.parse_stmt(code, self.table, self.scope)
+	return parse_stmt(code, self.table, self.scope)
 }
 
 pub fn (mut self Codegen) parse_stmts(code string) []ast.Stmt {
-	stmt := parser.parse_stmt('{\n$code\n}', self.table, self.scope)
+	stmt := parse_stmt('{\n$code\n}', self.table, self.scope)
 	if stmt is ast.Block {
 		return stmt.stmts
 	} else {

@@ -22,7 +22,7 @@ mut:
 
 // generates
 // ```vlang
-// fn (self Enum) to_json() string {
+// fn (self Enum) to_json() json2.Any {
 // 	return match self {
 // 		.one { 'ONE' }
 // 		else { error('Unexpected value $self') }
@@ -67,6 +67,7 @@ fn (mut self SerJsonEnum) get_enum_value_expr(field ast.EnumField, rename_to Enu
 }
 
 fn (mut self SerJsonEnum) add_impl() {
+	t_j2any := self.gen.find_type_or_add_placeholder('json2.Any', .v)
 	rename_to := self.get_rename_method()
 
 	mut body_stmts := []ast.Stmt{}
@@ -104,7 +105,7 @@ fn (mut self SerJsonEnum) add_impl() {
 		is_mut: false
 		is_ref: false
 		name: encode_json_member_name
-		return_type: ast.string_type
+		return_type: t_j2any
 		body_stmts: body_stmts
 		params: []
 		comments: [
