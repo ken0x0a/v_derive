@@ -50,12 +50,16 @@ assert input == output
 
 ## License
 
-MPL-2.0 (is not viral)
+Most code is under **MPL-2.0** (is not viral)
 https://www.mozilla.org/en-US/MPL/2.0/
 
 I might change the license to MIT and/or Apache-2.0 in future.
 So, please give me the right to change license in the future for your contribution,
 in case you'll contribute.
+
+### Other licenses
+/codegen/type.v is [MIT License](https://github.com/vlang/v/blob/5162c257a22f9005c0ec055727cedd10e85705ea/LICENSE)
+/codegen/parse_stmt.v is [MIT License](https://github.com/vlang/v/blob/ac2c3847afc0f7a9a0d3b99064188124df6a6fb5/LICENSE)
 
 ## Contributing
 
