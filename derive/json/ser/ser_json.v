@@ -36,6 +36,20 @@ pub fn add_encode_json(mut self Codegen, stmt ast.StructDecl) {
 	for field in stmt.fields {
 		body_stmts << set_value_stmt_or_skip(mut self, field)
 	}
+	for embed in stmt.embeds {
+		type_sym := self.table.final_sym(embed.typ)
+		match type_sym.info {
+			ast.Struct {
+				struct_def := type_sym.info
+				for field in struct_def.fields {
+					body_stmts << set_value_stmt_or_skip(mut self, field)
+				}
+			}
+			else {
+				panic('${type_sym.info.type_name()} is not supported yet!')
+			}
+		}
+	}
 	body_stmts << ast.Stmt(ast.Return{
 		exprs: [self.ident(json2_map_name)]
 	})

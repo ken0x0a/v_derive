@@ -16,12 +16,32 @@ fn (mut self DeserJsonFn) gen() {
 	stmt := self.stmt
 	mut body_stmts := get_decode_json_base_stmts(mut self.gen)
 
+	mut fields := if stmt.embeds.len > 0 {
+		// mut num_fields := stmt.fields.len
+		mut f_list := stmt.fields.map(self.gen_struct_init_field(it))
+		for embed in stmt.embeds {
+			type_sym := self.gen.table.final_sym(embed.typ)
+			match type_sym.info {
+				ast.Struct {
+					struct_def := type_sym.info
+					f_list << struct_def.fields.map(self.gen_struct_init_field(it))
+				}
+				else {
+					panic('${type_sym.info.type_name()} is not supported yet!')
+				}
+			}
+		}
+		// mut f_list := []StructInitField{cap: num_fields}
+		f_list
+	} else {
+		stmt.fields.map(self.gen_struct_init_field(it))
+	}
 	return_stmt := ast.Return{
 		exprs: [
 			ast.Expr(ast.StructInit{
 				// typ: self.table.sym(self.table.type_idxs[stmt.name])
 				typ: self.gen.find_type_or_add_placeholder(stmt.name, .v)
-				fields: stmt.fields.map(self.gen_struct_init_field(it))
+				fields: fields
 				// fields: [
 				// 	ast.StructInitField{
 				// 		name: 'field_name'
