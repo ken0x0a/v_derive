@@ -51,7 +51,7 @@ fn (mut self SerJsonEnum) get_enum_value_expr(field ast.EnumField, rename_to Enu
 		.camel_case {
 			parts := field.name.split('_')
 			p2 := parts[1..].map('${it[0..1].to_upper()}${it[1..]}')
-			self.gen.string_literal('${parts[0]}$p2')
+			self.gen.string_literal('${parts[0]}${p2.join('')}')
 		}
 		.kebab_case {
 			self.gen.string_literal(field.name.replace('_', '-'))
