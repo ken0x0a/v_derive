@@ -120,40 +120,40 @@ pub fn ser_json_get_default_expr(typ ast.Type) ast.Expr {
 	}
 	match typ {
 		ast.i8_type {
-			return codegen.integer_literal(-i8(u8(-1) / 2))
+			return codegen.integer_literal(i8(0))
 		}
 		ast.i16_type {
-			return codegen.integer_literal(-i16(u16(-1) / 2))
+			return codegen.integer_literal(i16(0))
 		}
 		ast.int_type {
-			return codegen.integer_literal(-int(int(-1) / 2))
+			return codegen.integer_literal(int(0))
 		}
 		ast.i64_type {
-			return codegen.integer_literal(-i64(u64(-1) / 2))
+			return codegen.integer_literal(i64(0))
 		}
 		ast.isize_type {
-			return codegen.integer_literal(-isize(usize(-1) / 2))
+			return codegen.integer_literal(isize(0))
 		}
 		ast.u8_type {
-			return codegen.integer_literal(byte(-1))
+			return codegen.integer_literal(byte(0))
 		}
 		ast.u16_type {
-			return codegen.integer_literal(u16(-1))
+			return codegen.integer_literal(u16(0))
 		}
 		ast.u32_type {
-			return codegen.integer_literal(u32(-1))
+			return codegen.integer_literal(u32(0))
 		}
 		ast.u64_type {
-			return codegen.integer_literal(u64(-1))
+			return codegen.integer_literal(u64(0))
 		}
 		ast.usize_type {
-			return codegen.integer_literal(usize(-1))
+			return codegen.integer_literal(usize(0))
 		}
 		ast.f32_type {
-			return codegen.float_literal(-1.0)
+			return codegen.float_literal(0.0)
 		}
 		ast.f64_type {
-			return codegen.float_literal(-1.0)
+			return codegen.float_literal(0.0)
 		}
 		ast.bool_type {
 			return codegen.bool_literal(false)
