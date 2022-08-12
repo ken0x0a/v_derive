@@ -23,7 +23,7 @@ const (
 
 // generates
 // ```vlang
-// fn (self Struct) to_json() json2.Any {
+// fn (self &Struct) to_json() json2.Any {
 // 	mut obj := map[string]json2.Any{}
 // 	obj['name'] = self.name
 // 	obj['f64_val'] = f64(self.f64_val).str().trim_right('.') // as str
@@ -282,7 +282,7 @@ fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.E
 	mut has_str_method := false
 	mut is_alias := false
 	for {
-		if type_sym.has_method(encode_json_member_name) {
+		if symbol__has_encode_method(mut self, type_sym) {
 			has_ser_json_method = true
 			break
 		}
@@ -365,23 +365,7 @@ fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.E
 				map_arg_expr := get_type_recursively(mut self, field, self.ident('it'),
 										info.elem_type)
 				elem_type_sym := self.table.sym(info.elem_type)
-				mut has_encode_method := false
-				match elem_type_sym.info {
-					ast.Struct {
-						if attr := elem_type_sym.info.attrs.find_first('derive') {
-							has_encode_method = attr.arg.contains(macro_name)
-						}
-					}
-					ast.Enum {
-						enum_decl := self.table.enum_decls[elem_type_sym.name]
-						if attr := enum_decl.attrs.find_first('derive') {
-							has_encode_method = attr.arg.contains(macro_name)
-						}
-					}
-					else {
-						// 
-					}
-				}
+				has_encode_method := symbol__has_encode_method(mut self, elem_type_sym)
 				return ast.Expr(ast.CastExpr{
 					typ: j2any
 					expr: ast.CallExpr{
@@ -391,7 +375,7 @@ fn get_type_recursively(mut self Codegen, field ast.StructField, field_sel ast.E
 								is_mut: false
 								share: .mut_t
 								// expr: if info.elem_type == j2any || elem_type_sym.has_method(encode_json_member_name) {
-								expr: if info.elem_type == j2any || has_encode_method || self.table.has_method(elem_type_sym, encode_json_member_name) {
+								expr: if info.elem_type == j2any || has_encode_method {
 										map_arg_expr
 									} else { ast.CastExpr{
 										typ: j2any
@@ -451,4 +435,29 @@ fn get_ser_as(attrs []ast.Attr) string {
 		}
 	}
 	return ''
+}
+
+fn symbol__has_encode_method(mut self Codegen, type_sym &ast.TypeSymbol) bool {
+	// type_sym.has_method(encode_json_member_name)
+	if self.table.has_method(type_sym, encode_json_member_name) {
+		return true
+	}
+
+	match type_sym.info {
+		ast.Struct {
+			if attr := type_sym.info.attrs.find_first('derive') {
+				return attr.arg.contains(macro_name)
+			}
+		}
+		ast.Enum {
+			enum_decl := self.table.enum_decls[type_sym.name]
+			if attr := enum_decl.attrs.find_first('derive') {
+				return attr.arg.contains(macro_name)
+			}
+		}
+		else {
+			// 
+		}
+	}
+	return false
 }
