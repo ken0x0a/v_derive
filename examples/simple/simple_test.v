@@ -14,3 +14,15 @@ fn test_struct_item() ? {
 
 	assert input == output
 }
+fn test_struct_embedded() ? {
+	input := '{"name":"Cool Stuff","price":999.9}'
+	j := json2.raw_decode(input) ?
+	item := macro_deser_json__embedded(j) ?
+
+	assert item.name == 'Cool Stuff'
+	assert item.price == 999.9
+
+	output := item.to_json().str()
+
+	assert input == output
+}
