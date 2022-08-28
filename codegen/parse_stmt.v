@@ -8,7 +8,6 @@ module codegen
 import v.scanner
 import v.ast
 import v.pref
-import v.util
 import v.parser
 
 fn parse_stmt(text string, table &ast.Table, scope &ast.Scope) ast.Stmt {
